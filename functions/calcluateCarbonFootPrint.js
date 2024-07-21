@@ -16,7 +16,7 @@ export const calculateCarbonFootprint = functions.firestore
 
     try {
       const query = `
-        Calculate the carbon footprint for the following product details, don't say i can't try your best. be professional in response and brief. try to estimate a range if you can't. give me a number and be brief
+        Calculate the carbon footprint for the following product details, don't say i can't try your best. be professional in response and brief. try to estimate a range if you can't. give me a number and be brief, don't add any introductory or clarification text
         Name: ${product.name}
         Description: ${product.description}
         Price: ${product.price}

@@ -48,11 +48,11 @@ export const generateTravelPlan = functions.firestore
         Generate a 7-mood travel plan for visiting ${country}. The moods should be: Adventure, Romance, Cultural Exploration, Relaxation, Family Fun, Food & Dining, and Shopping. Each mood should have multiple entries (up to 10-15), and each entry should have a name, best time to visit, and a brief description of the place to visit. Please structure the response as a JSON object with mood names as keys and each key should contain an array of objects with the properties: name, time (best time in day), and description. The JSON object should look like this:
         {
           "Adventure": [
-            {"name": "Example Place", "time": "Best time to visit in the day", "description": "Brief description of the place"},
+            {"name": "Example Place", "exactName": "exact name to search for it in google", "time": "Best time to visit in the day", "description": "Brief description of the place"},
             ...
           ],
           "Romance": [
-            {"name": "Example Place", "time": "Best time to visit in the day", "description": "Brief description of the place"},
+            {"name": "Example Place", "exactName": "exact name to search for it in google", "time": "Best time to visit in the day", "description": "Brief description of the place"},
             ...
           ],
           ...
@@ -75,7 +75,7 @@ export const generateTravelPlan = functions.firestore
       for (const mood in travelPlan) {
         for (const place of travelPlan[mood]) {
           latLongAndPhotoPromises.push(
-            getLatLong(place.name).then((latLong) => {
+            getLatLong(place.exactName).then((latLong) => {
               place.latitude = latLong.latitude;
               place.longitude = latLong.longitude;
               return fetchPhotoUrl(place.name).then((photoUrl) => {

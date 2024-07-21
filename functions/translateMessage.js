@@ -8,30 +8,37 @@ export const translateMessage = functions.firestore
   .document("chatRooms/{roomId}/messages/{messageId}")
   .onCreate(async (snap, context) => {
     const message = snap.data();
-    const userId = message.userId; // Extract userId from message
+    const userId = message.userId; 
+    const roomId = context.params.roomId;
 
     try {
-      // Fetch user's base language from 'users' collection
-      const userDoc = await db.collection("users").doc(userId).get();
-      const user = userDoc.data();
-      const baseLanguage = user?.baseLanguage || 'en'; // Default to 'en' if baseLanguage is not found
+      // Extract user IDs from roomId
+      const [userA, userB] = roomId.split('_');
+      const otherUserId = userId === userA ? userB : userA;
 
+      // Fetch the base languages for both users
+      const otherUserDoc = await db.collection("users").doc(otherUserId).get();
+      const otherUser = otherUserDoc.data();
+      const otherBaseLanguage = otherUser?.baseLanguage || 'en'; // Default to 'en' if baseLanguage is not found
+
+      // Initialize Google Generative AI model
       const genAI = new GoogleGenerativeAI(GEN_AI_KEY);
       const model = genAI.getGenerativeModel({
         model: "gemini-1.5-flash",
       });
 
-      // Prepare translation request using the user's base language
+      // Prepare translation request using the receiver's base language
       const result = await model.generateContent([
-        `please translate this into ${baseLanguage} and only respond with the translated text, here's the text: ${message.text}`,
+        `please translate this into ${otherBaseLanguage} and only respond with the translated text, here's the text: ${message.text}`,
       ]);
 
       const translatedText =
         result?.response.candidates[0].content.parts[0].text || "";
 
+      // Update the message with the translated text
       await db
         .collection("chatRooms")
-        .doc(context.params.roomId)
+        .doc(roomId)
         .collection("messages")
         .doc(context.params.messageId)
         .update({ translatedText });
