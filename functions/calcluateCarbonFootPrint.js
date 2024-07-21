@@ -16,15 +16,26 @@ export const calculateCarbonFootprint = functions.firestore
 
     try {
       const query = `
-        Calculate the carbon footprint for the following product details, don't say i can't try your best. be professional in response and brief. try to estimate a range if you can't. give me a number and be brief, don't add any introductory or clarification text
-        Name: ${product.name}
-        Description: ${product.description}
-        Price: ${product.price}
-        Material Type: ${product.materialType}
-        Production Method: ${product.productionMethod}
-        Transportation Method: ${product.transportationMethod}
-        Product Weight: ${product.productWeight} kg
-        Local or Imported: ${product.localOrImported}
+      Calculate the estimated carbon footprint range (in kg CO2e) for the following product:
+      
+      Product Details:
+      - Name: ${product.name}
+      - Description: ${product.description}
+      - Price: ${product.price}
+      - Material: ${product.materialType}
+      - Production: ${product.productionMethod}
+      - Transportation: ${product.transportationMethod}
+      - Weight: ${product.productWeight} kg
+      - Origin: ${product.localOrImported}
+      
+      Requirements:
+      1. Provide a numeric estimate or range in kg CO2e.
+      2. Consider full lifecycle: raw materials, manufacturing, transportation, use, and disposal.
+      3. Use industry averages and best practices for estimation.
+      4. If exact calculation is impossible, provide a reasonable range based on similar products.
+      5. Respond with only the numeric estimate or range, no additional text.
+      
+      Format: [number] kg CO2e or [lower bound]-[upper bound] kg CO2e
       `;
 
       const result = await model.generateContent([query]);
@@ -32,19 +43,31 @@ export const calculateCarbonFootprint = functions.firestore
       const carbonFootprint =
         result?.response.candidates[0].content.parts[0].text || "";
 
-      const adviceQuery = `
-        Provide advice on how to reduce the carbon footprint for the following product details, don't say i can't try your best. be professional in response and brief. try to estimate an approximate response if you can, be brief
-        Name: ${product.name}
-        Description: ${product.description}
-        Price: ${product.price}
-        Material Type: ${product.materialType}
-        Production Method: ${product.productionMethod}
-        Transportation Method: ${product.transportationMethod}
-        Product Weight: ${product.productWeight} kg
-        Local or Imported: ${product.localOrImported}
-      `;
-
-      const adviceResult = await model.generateContent([adviceQuery]);
+        const adviceQuery = `
+        Provide concise, actionable advice to reduce the carbon footprint of the following product:
+        
+        Product Details:
+        - Name: ${product.name}
+        - Description: ${product.description}
+        - Price: ${product.price}
+        - Material: ${product.materialType}
+        - Production: ${product.productionMethod}
+        - Transportation: ${product.transportationMethod}
+        - Weight: ${product.productWeight} kg
+        - Origin: ${product.localOrImported}
+        
+        Requirements:
+        1. Offer 3-5 specific, practical recommendations.
+        2. Focus on the most impactful areas based on the product details.
+        3. Consider all stages: materials, production, transportation, use, and end-of-life.
+        4. Prioritize suggestions that maintain or enhance product quality and functionality.
+        5. If applicable, suggest alternative materials or methods with lower environmental impact.
+        6. Provide brief rationale for each recommendation (1-2 sentences max).
+        
+        Format your response as a numbered list of concise bullet points. Aim for clarity and actionability in your advice.
+        `;
+        
+        const adviceResult = await model.generateContent([adviceQuery]);
 
       const reductionAdvice =
         adviceResult?.response.candidates[0].content.parts[0].text || "";

@@ -1,12 +1,15 @@
 import functions from "firebase-functions";
-import { db } from "./firebaseAdmin.js"; // Import initialized Firebase Admin
+import { db } from "./firebaseAdmin.js";
 import axios from "axios";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
 
 const GOOGLE_API_KEY = "AIzaSyDTiF7YjBUWM0l0nKpzicv9R6kReU3dn8Q";
 const GEN_AI_KEY = "AIzaSyCrRE67ES56RfBPeTZ4X2ZB7u1_r4Aolsk";
 const IMAGE_SEARCH_API_KEY = "AIzaSyDPbsh2cXsQZY8IQgSfKYj3Be1Zeg4i8DQ";
 const CX = "d189de1b204794ec5";
+
+const MAX_RETRIES = 5;
+const INITIAL_RETRY_DELAY = 1000; // 1 second
 
 const fetchPhotoUrl = async (description) => {
   try {
@@ -31,6 +34,32 @@ const fetchPhotoUrl = async (description) => {
   }
 };
 
+const cleanupJSON = (jsonString) => {
+  const start = jsonString.indexOf('{');
+  const end = jsonString.lastIndexOf('}');
+  
+  if (start === -1 || end === -1) {
+    throw new Error("No valid JSON object found in the response");
+  }
+  
+  return jsonString.slice(start, end + 1);
+};
+
+const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+const retryOperation = async (operation, retries = 0) => {
+  try {
+    return await operation();
+  } catch (error) {
+    if (retries >= MAX_RETRIES) {
+      throw error;
+    }
+    console.log(`Attempt ${retries + 1} failed. Retrying...`);
+    await wait(INITIAL_RETRY_DELAY * Math.pow(2, retries));
+    return retryOperation(operation, retries + 1);
+  }
+};
+
 export const generateTravelPlan = functions.firestore
   .document("users/{userId}")
   .onCreate(async (snap, context) => {
@@ -42,35 +71,178 @@ export const generateTravelPlan = functions.firestore
       model: "gemini-1.5-flash",
     });
 
-    try {
-      // Fetch detailed 7-mood travel plan
-      const query = `
-        Generate a 7-mood travel plan for visiting ${country}. The moods should be: Adventure, Romance, Cultural Exploration, Relaxation, Family Fun, Food & Dining, and Shopping. Each mood should have multiple entries (up to 10-15), and each entry should have a name, best time to visit, and a brief description of the place to visit. Please structure the response as a JSON object with mood names as keys and each key should contain an array of objects with the properties: name, time (best time in day), and description. The JSON object should look like this:
-        {
-          "Adventure": [
-            {"name": "Example Place", "exactName": "exact name to search for it in google", "time": "Best time to visit in the day", "description": "Brief description of the place"},
-            ...
-          ],
-          "Romance": [
-            {"name": "Example Place", "exactName": "exact name to search for it in google", "time": "Best time to visit in the day", "description": "Brief description of the place"},
-            ...
-          ],
-          ...
+    const schema = {
+      type: "object",
+      properties: {
+        Adventure: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              name: { type: "string" },
+              exactName: { type: "string" },
+              time: { type: "string" },
+              description: { type: "string" }
+            },
+            required: ["name", "exactName", "time", "description"]
+          }
+        },
+        Romance: { 
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              name: { type: "string" },
+              exactName: { type: "string" },
+              time: { type: "string" },
+              description: { type: "string" }
+            },
+            required: ["name", "exactName", "time", "description"]
+          }
+        },
+        "Cultural Exploration": { 
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              name: { type: "string" },
+              exactName: { type: "string" },
+              time: { type: "string" },
+              description: { type: "string" }
+            },
+            required: ["name", "exactName", "time", "description"]
+          }
+        },
+        Relaxation: { 
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              name: { type: "string" },
+              exactName: { type: "string" },
+              time: { type: "string" },
+              description: { type: "string" }
+            },
+            required: ["name", "exactName", "time", "description"]
+          }
+        },
+        "Family Fun": { 
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              name: { type: "string" },
+              exactName: { type: "string" },
+              time: { type: "string" },
+              description: { type: "string" }
+            },
+            required: ["name", "exactName", "time", "description"]
+          }
+        },
+        "Food & Dining": { 
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              name: { type: "string" },
+              exactName: { type: "string" },
+              time: { type: "string" },
+              description: { type: "string" }
+            },
+            required: ["name", "exactName", "time", "description"]
+          }
+        },
+        Shopping: { 
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              name: { type: "string" },
+              exactName: { type: "string" },
+              time: { type: "string" },
+              description: { type: "string" }
+            },
+            required: ["name", "exactName", "time", "description"]
+          }
         }
+      },
+      required: ["Adventure", "Romance", "Cultural Exploration", "Relaxation", "Family Fun", "Food & Dining", "Shopping"]
+    };
+
+    const generateAndParseTravelPlan = async () => {
+      const query = `
+        Generate a comprehensive 7-mood travel plan for ${country}. Structure the response as a JSON object with the following specifications:
+        
+        Moods:
+        1. Adventure
+        2. Romance
+        3. Cultural Exploration
+        4. Relaxation
+        5. Family Fun
+        6. Food & Dining
+        7. Shopping
+        
+        For each mood:
+        - Provide 10-15 unique entries
+        - Ensure diversity in types of attractions and activities
+        - Include both popular and lesser-known destinations
+        
+        Each entry should contain:
+        - name: A concise, descriptive title
+        - exactName: The precise name for google maps purpose, the name should be specific enough to return accurate latitude and longitude, for example if you suggest sea food restuarant in New York, the exactName should be the name of the restaurant
+        - time: Optimal time of day to visit (e.g., "Early morning", "Afternoon", "Evening")
+        - description: A brief, engaging description (20-30 words)
+        
+        Guidelines:
+        1. Ensure all entries are actually located in ${country}
+        2. Provide a mix of indoor and outdoor activities where applicable
+        3. Include seasonal activities if relevant
+        4. Avoid duplicate entries across different moods
+        5. Ensure the "exactName" is specific enough for accurate Google searches
+        
+        Return only the JSON object with no additional text or explanation.
       `;
 
-      const result = await model.generateContent([query]);
-      const travelPlanText =
-        result?.response.candidates[0].content.parts[0].text || "";
+      const result = await model.generateContent({
+        contents: [{ role: "user", parts: [{ text: query }] }],
+        generationConfig: {
+          temperature: 0.7,
+          topK: 1,
+          topP: 1,
+          maxOutputTokens: 8192,
+          responseMimeType: "application/json",
+          responseSchema: schema,
+        },
+        safetySettings: [
+          {
+            category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+            threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+          },
+          {
+            category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+            threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+          },
+          {
+            category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+            threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+          },
+          {
+            category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+            threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+          },
+        ],
+      });
 
-      // Parse the travel plan into a JavaScript object
-      const travelPlan = parseJsonString(travelPlanText);
+      const rawResponse = result.response.text();
+      console.log("Raw AI response:", rawResponse);
 
-      if (!travelPlan) {
-        throw new Error("Failed to parse travel plan.");
-      }
+      const cleanedResponse = cleanupJSON(rawResponse);
+      return JSON.parse(cleanedResponse);
+    };
 
-      // Fetch latitude, longitude, and photos for all places concurrently
+    try {
+      const travelPlan = await retryOperation(generateAndParseTravelPlan);
+
       const latLongAndPhotoPromises = [];
       for (const mood in travelPlan) {
         for (const place of travelPlan[mood]) {
@@ -88,27 +260,18 @@ export const generateTravelPlan = functions.firestore
 
       await Promise.all(latLongAndPhotoPromises);
 
-      // Save the updated travel plan back to Firestore
       await db.collection("users").doc(context.params.userId).update({
         travelPlan,
       });
 
       console.log("Travel plan saved successfully!");
     } catch (error) {
-      console.error("Error generating travel plan:", error);
+      console.error("Error generating travel plan after all retries:", error);
+      await db.collection("users").doc(context.params.userId).update({
+        travelPlanError: error.message,
+      });
     }
   });
-
-const parseJsonString = (jsonString) => {
-  // Remove code block delimiters if they exist
-  const cleanedString = jsonString.replace(/```json|```/g, "").trim();
-  try {
-    return JSON.parse(cleanedString);
-  } catch (error) {
-    console.error("Failed to parse JSON:", error);
-    return null;
-  }
-};
 
 const getLatLong = async (placeName) => {
   try {
@@ -122,13 +285,29 @@ const getLatLong = async (placeName) => {
       }
     );
 
-    const location = response.data.results[0]?.geometry?.location || {
-      lat: null,
-      lng: null,
-    };
+    if (response.data.status !== "OK") {
+      console.error(`Geocoding API error for ${placeName}: ${response.data.status}`);
+      console.error("Full response:", JSON.stringify(response.data, null, 2));
+      return { latitude: null, longitude: null };
+    }
+
+    if (response.data.results.length === 0) {
+      console.error(`No results found for ${placeName}`);
+      return { latitude: null, longitude: null };
+    }
+
+    const location = response.data.results[0].geometry.location;
+    if (!location || typeof location.lat !== 'number' || typeof location.lng !== 'number') {
+      console.error(`Invalid location data for ${placeName}:`, location);
+      return { latitude: null, longitude: null };
+    }
+
     return { latitude: location.lat, longitude: location.lng };
   } catch (error) {
     console.error(`Error fetching lat/long for ${placeName}:`, error);
+    if (error.response) {
+      console.error("Error response:", error.response.data);
+    }
     return { latitude: null, longitude: null };
   }
 };

@@ -19,9 +19,22 @@ export const detectBaseLanguage = functions.firestore
           model: "gemini-1.5-flash",
         });
 
-        const result = await model.generateContent([
-          `What is the primary language spoken in ${user.baseCountry}? Just say the language name with no more introduction.`,
-        ]);
+        const languageQuery = `
+        Identify the primary official language of ${user.baseCountry}.
+        
+        Requirements:
+        1. Provide only the name of the language.
+        2. If multiple official languages exist, list only the most widely spoken one.
+        3. Use the English name for the language.
+        4. Do not include any introductory text, explanations, or punctuation.
+        
+        Example responses:
+        English
+        Spanish
+        Mandarin Chinese
+        `;
+        
+        const result = await model.generateContent([languageQuery]);
 
         const baseLanguage = result?.response?.candidates[0]?.content?.parts[0]?.text || "en";
         console.log(`Detected language: ${baseLanguage}`);
