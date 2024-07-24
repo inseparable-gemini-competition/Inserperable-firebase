@@ -6,14 +6,7 @@ import {
   HarmBlockThreshold,
 } from "@google/generative-ai";
 
-export const generateText = functions.https.onCall(async (data, context) => {
-  // Ensure the user is authenticated
-  if (!context.auth) {
-    throw new functions.https.HttpsError(
-      "unauthenticated",
-      "User must be authenticated to use this function"
-    );
-  }
+export const generateText = functions.https.onCall(async (data) => {
 
   const { base64Image, modelType, promptType, inputData } = data;
 

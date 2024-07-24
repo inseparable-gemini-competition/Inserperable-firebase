@@ -3,14 +3,7 @@ import functions from "firebase-functions";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export const generateJsonContent = functions.https.onCall(
-  async (data, context) => {
-    // Ensure the user is authenticated
-    if (!context.auth) {
-      throw new functions.https.HttpsError(
-        "unauthenticated",
-        "User must be authenticated to use this function"
-      );
-    }
+  async (data) => {
 
     const { promptType, inputData } = data;
 
