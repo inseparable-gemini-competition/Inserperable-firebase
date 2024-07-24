@@ -3,10 +3,10 @@ import { db } from "./firebaseAdmin.js";
 import axios from "axios";
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
 
-const GOOGLE_API_KEY = "AIzaSyDTiF7YjBUWM0l0nKpzicv9R6kReU3dn8Q";
-const GEN_AI_KEY = "AIzaSyCrRE67ES56RfBPeTZ4X2ZB7u1_r4Aolsk";
-const IMAGE_SEARCH_API_KEY = "AIzaSyDPbsh2cXsQZY8IQgSfKYj3Be1Zeg4i8DQ";
-const CX = "d189de1b204794ec5";
+const GOOGLE_API_KEY = functions.config().google.apikey;
+const GEN_AI_KEY = functions.config().genai.apikey;
+const IMAGE_SEARCH_API_KEY = functions.config().search.apikey;
+const CX = functions.config().search.cx;
 
 const MAX_RETRIES = 5;
 const INITIAL_RETRY_DELAY = 1000; // 1 second

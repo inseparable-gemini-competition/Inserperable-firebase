@@ -2,7 +2,7 @@ import functions from "firebase-functions";
 import { db } from "./firebaseAdmin.js"; // Import initialized Firebase Admin
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const GEN_AI_KEY = "AIzaSyCrRE67ES56RfBPeTZ4X2ZB7u1_r4Aolsk";
+const GEN_AI_KEY = functions.config().genai.apikey;
 
 export const calculateCarbonFootprint = functions.firestore
   .document("products/{productId}")
