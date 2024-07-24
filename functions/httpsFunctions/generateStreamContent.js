@@ -52,7 +52,7 @@ export const generateStreamContent = functions.https.onCall(async (data) => {
     console.error("Error generating content:", error);
     throw new functions.https.HttpsError(
       "internal",
-      "Error generating content"
+      "Error generating content: " + JSON.stringify(error)
     );
   }
 });

@@ -3,6 +3,6 @@
 import { createPromptObject } from "../utils/promptUtils.js";
 
 export const getTranslatePrompt = (inputData) => {
-  const prompt = `Translate the following text to ${inputData?.targetLanguage} language: ${inputData?.text}`;
+  const prompt = `Translate the following text to ${inputData?.targetLanguage || ""} language: ${inputData?.text} || ""`;
   return createPromptObject(prompt);
 };

@@ -5,22 +5,22 @@ import { generateSchema } from "../generateSchema.js";
 
 export const getTabooPrompt = (inputData) => {
   const prompt = `Using ${getRandomSeed()} as a seed, think of about max diverse cultural taboos you can for ${
-    inputData?.country
+    inputData?.country || ""
   }, select one random taboo, and describe it concisely in 3 lines or less, focusing on its significance and how travelers can respectfully avoid it. try to be diversified`;
   return createPromptObject(prompt);
 };
 
 export const getTibsPrompt = (inputData) => {
   const prompt = `Using ${getRandomSeed()} as a random seed, think of 100 unique travel tips for ${
-    inputData?.selectedType
+    inputData?.selectedType || ""
   } in ${
-    inputData?.country
+    inputData?.country || ""
   }. Then, select 3 truly random tips from this list. Ensure the tips are diverse and not commonly known. Provide only these 3 tips, keeping the total response under 150 words. Do not repeat tips from previous interactions.`;
   return createPromptObject(prompt);
 };
 
 export const getDonatePrompt = (inputData) => {
-  const prompt = `Tell me about donation entities or organizations you have to give url, name and description (6 exact lines) for the organization that could benefit from my donation in ${inputData.country}`;
+  const prompt = `Tell me about donation entities or organizations you have to give url, name and description (6 exact lines) for the organization that could benefit from my donation in ${inputData?.country}`;
   const schema = generateSchema("recommendation donation entity name", {
     name: ["string", "donation entity name"],
     websiteLink: ["string", "donation entity website link"],
@@ -30,11 +30,11 @@ export const getDonatePrompt = (inputData) => {
 };
 
 export const getSituationPrompt = (inputData) => {
-  const prompt = `I am in the following situation: ${inputData?.userSituation}. What should I say in ${inputData?.country} language?`;
+  const prompt = `I am in the following situation: ${inputData?.userSituation || ""}. What should I say in ${inputData?.country || ""} language?`;
   return createPromptObject(prompt);
 };
 
-export const getCountryRecommendationPrompt = ({ answers, questions }) => {
+export const getCountryRecommendationPrompt = ({ answers = "", questions = "" }) => {
   const prompt = `
   Based on the user's preferences and answers provided below, recommend a suitable country for their next travel destination. Exclude their base country (indicated in the answer to question 1) from your recommendation.
   
