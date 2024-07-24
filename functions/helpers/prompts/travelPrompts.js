@@ -34,12 +34,12 @@ export const getSituationPrompt = (inputData) => {
   return createPromptObject(prompt);
 };
 
-export const getCountryRecommendationPrompt = ({ answers = "", questions = "" }) => {
+export const getCountryRecommendationPrompt = ({ answers = {}, questions = {} }) => {
   const prompt = `
   Based on the user's preferences and answers provided below, recommend a suitable country for their next travel destination. Exclude their base country (indicated in the answer to question 1) from your recommendation.
   
-  User's answers: ${answers}
-  Corresponding questions: ${questions}
+  User's answers: ${JSON.stringify(answers)}
+  Corresponding questions: ${JSON.stringify(questions)}
   
   Please provide the following information in your response:
   
@@ -64,7 +64,7 @@ export const getCountryRecommendationPrompt = ({ answers = "", questions = "" })
   return createPromptObject(prompt, schema);
 };
 
-export const getEnvironmentalImpactPrompt = ({ answers, questions }) => {
+export const getEnvironmentalImpactPrompt = ({ answers = {}, questions = {} }) => {
   const prompt = `
 Based on the user's travel plans and the answers provided below, calculate their environmental impact score and recommend steps to minimize their negative impact.
 
