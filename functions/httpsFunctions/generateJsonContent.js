@@ -1,4 +1,4 @@
-import { getPrompts } from "./getPrompts";
+import { getPrompts } from "../helpers/getPrompts";
 import { functions } from "firebase-functions";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
