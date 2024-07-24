@@ -1,6 +1,6 @@
 import functions from "firebase-functions";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { getPrompts } from "../helpers/getPrompts";
+import { getPrompts } from "../helpers/getPrompts.js";
 
 const API_KEY = functions.config().genai.apikey;
 

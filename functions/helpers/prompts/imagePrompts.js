@@ -1,5 +1,5 @@
 
-import { createPromptObject } from "../utils/promptUtils";
+import { createPromptObject } from "../utils/promptUtils.js";
 
 
 export const getIdentifyPrompt = () => {

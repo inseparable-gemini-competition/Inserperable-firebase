@@ -1,5 +1,5 @@
 import functions from "firebase-functions";
-import { db } from "./firebaseAdmin.js";
+import { db } from "../helpers/firebaseAdmin.js";
 import axios from "axios";
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
 

@@ -1,7 +1,7 @@
 // src/prompts/travelPrompts.js
 
-import { createPromptObject, getRandomSeed } from "../utils/promptUtils";
-import { generateSchema } from "../utils/schemaUtils";
+import { createPromptObject, getRandomSeed } from "../utils/promptUtils.js";
+import { generateSchema } from "../generateSchema.js";
 
 export const getTabooPrompt = (inputData) => {
   const prompt = `Using ${getRandomSeed()} as a seed, think of about max diverse cultural taboos you can for ${
@@ -59,6 +59,27 @@ export const getCountryRecommendationPrompt = ({ answers, questions }) => {
       "string",
       "most famous landmark for the recommended country",
     ],
+  });
+
+  return createPromptObject(prompt, schema);
+};
+
+export const getEnvironmentalImpactPrompt = ({ answers, questions }) => {
+  const prompt = `
+Based on the user's travel plans and the answers provided below, calculate their environmental impact score and recommend steps to minimize their negative impact.
+
+User's answers: ${JSON.stringify(answers)}
+Corresponding questions: ${JSON.stringify(questions)}
+
+Please provide the following information in your response:
+
+1. impactScore: Calculate the user's environmental impact score based on their answers.
+2. recommendations: Provide specific steps the user can take to reduce their environmental impact.
+`;
+
+  const schema = generateSchema("calculate environmental impact", {
+    impactScore: ["number", "environmental impact score"],
+    recommendations: ["string", "steps to avoid bad impact"],
   });
 
   return createPromptObject(prompt, schema);

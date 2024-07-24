@@ -1,5 +1,5 @@
-import { getPrompts } from "../helpers/getPrompts";
-import { functions } from "firebase-functions";
+import { getPrompts } from "../helpers/getPrompts.js";
+import functions from "firebase-functions";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export const generateJsonContent = functions.https.onCall(

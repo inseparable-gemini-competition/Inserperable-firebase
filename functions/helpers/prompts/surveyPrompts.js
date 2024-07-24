@@ -1,6 +1,6 @@
 // src/prompts/surveyPrompts.js
 
-import { createPromptObject } from "../utils/promptUtils";
+import { createPromptObject } from "../utils/promptUtils.js";
 
 export const getNextQuestionCountryPrompt = () => {
   const prompt = `Generate a series of questions to help calculate the user's environmental impact for their travel plans. Each question should be based on previous answers and presented as a JSON object. Continue asking questions until explicitly told to stop.

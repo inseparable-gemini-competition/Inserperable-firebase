@@ -1,9 +1,8 @@
-import { PROMPT_TYPES } from '../constants/promptTypes';
-import * as travelPrompts from '../prompts/travelPrompts';
-import * as languagePrompts from '../prompts/languagePrompts';
-import * as imagePrompts from '../prompts/imagePrompts';
-import * as surveyPrompts from '../prompts/surveyPrompts';
-import * as environmentalPrompts from '../prompts/environmentalPrompts';
+import { PROMPT_TYPES } from '../constants/promptTypes.js';
+import * as travelPrompts from '../prompts/travelPrompts.js';
+import * as languagePrompts from '../prompts/languagePrompts.js';
+import * as imagePrompts from '../prompts/imagePrompts.js';
+import * as surveyPrompts from '../prompts/surveyPrompts.js';
 
 export default {
   [PROMPT_TYPES.TABOO]: { category: travelPrompts, functionName: 'getTabooPrompt' },
@@ -16,7 +15,7 @@ export default {
   [PROMPT_TYPES.TRANSLATE]: { category: languagePrompts, functionName: 'getTranslatePrompt' },
   [PROMPT_TYPES.SURVEY_QUESTION_COUNTRY]: { category: surveyPrompts, functionName: 'getNextQuestionCountryPrompt' },
   [PROMPT_TYPES.COUNTRY_RECOMMENDATION]: { category: travelPrompts, functionName: 'getCountryRecommendationPrompt' },
-  [PROMPT_TYPES.ENVIRONMENTAL_IMPACT]: { category: environmentalPrompts, functionName: 'getEnvironmentalImpactPrompt' },
+  [PROMPT_TYPES.ENVIRONMENTAL_IMPACT]: { category: travelPrompts, functionName: 'getEnvironmentalImpactPrompt' },
   [PROMPT_TYPES.NEXT_QUESTION_COUNTRY]: { category: surveyPrompts, functionName: 'getNextQuestionCountryPrompt' },
-  [PROMPT_TYPES.NEXT_QUESTION_ENVIRONMENT]: { category: environmentalPrompts, functionName: 'getNextQuestionEnvironmentPrompt' },
+  [PROMPT_TYPES.NEXT_QUESTION_ENVIRONMENT]: { category: surveyPrompts, functionName: 'getNextQuestionEnvironmentPrompt' },
 };

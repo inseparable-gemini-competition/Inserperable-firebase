@@ -1,7 +1,7 @@
 // src/getPrompts.js
 
-import { PROMPT_TYPES } from './constants/promptTypes';
-import promptConfig from './config/promptConfig';
+import { PROMPT_TYPES } from './constants/promptTypes.js';
+import promptConfig from './config/promptConfig.js';
 
 export const getPrompts = (inputData) => {
   const prompts = {};

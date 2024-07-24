@@ -4,12 +4,12 @@ import {
   generateTravelPlan,
   calculateCarbonFootprint,
   translateMessage,
-} from "./firestoreFunctions";
+} from "./firestoreFunctions/index.js";
 import {
   generateJsonContent,
   generateStreamContent,
   generateText,
-} from "./httpsFunctions";
+} from "./httpsFunctions/index.js";
 
 // Export functions
 export {
