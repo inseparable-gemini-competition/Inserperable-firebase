@@ -1,13 +1,8 @@
 // src/prompts/languagePrompts.js
 
-import { generateDynamicPrompt, createPromptObject } from '../utils/promptUtils';
+import { createPromptObject } from "../utils/promptUtils";
 
-export const getReadPrompt = (data) => {
-  const template = `Determine the language of the text in this image, then translate the text to \${language} language`;
-  return createPromptObject(generateDynamicPrompt(template, data));
-};
-
-export const getTranslatePrompt = (data) => {
-  const template = `Translate the following text to \${targetLanguage} language: \${text}`;
-  return createPromptObject(generateDynamicPrompt(template, data));
+export const getTranslatePrompt = (inputData) => {
+  const prompt = `Translate the following text to ${inputData?.targetLanguage} language: ${inputData?.text}`;
+  return createPromptObject(prompt);
 };
