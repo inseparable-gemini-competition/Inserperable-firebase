@@ -64,7 +64,7 @@ export const getCountryRecommendationPrompt = (inputData) => {
   return createPromptObject(prompt, schema);
 };
 
-export const getEnvironmentalImpactPromptt = (inputData) => {
+export const getEnvironmentalImpactPrompt = (inputData) => {
   const prompt = `
 Based on the user's travel plans and the answers provided below, calculate their environmental impact score and recommend steps to minimize their negative impact.
 
