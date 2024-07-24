@@ -1,8 +1,23 @@
 // Import required modules
-import { generateTravelPlan } from "./generateTravelPlan.js";
-import { calculateCarbonFootprint } from "./calcluateCarbonFootPrint.js";
-import { translateMessage } from "./translateMessage.js";
-import { detectBaseLanguage } from "./detectBaseLanguage.js";
+import {
+  detectBaseLanguage,
+  generateTravelPlan,
+  calculateCarbonFootprint,
+  translateMessage,
+} from "./firestoreFunctions";
+import {
+  generateJsonContent,
+  generateStreamContent,
+  generateText,
+} from "./httpsFunctions";
 
 // Export functions
-export { generateTravelPlan, calculateCarbonFootprint, translateMessage, detectBaseLanguage };
+export {
+  generateTravelPlan,
+  calculateCarbonFootprint,
+  translateMessage,
+  detectBaseLanguage,
+  generateJsonContent,
+  generateStreamContent,
+  generateText,
+};
