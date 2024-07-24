@@ -1,4 +1,4 @@
-import functions from "firebase-functions";
+import * as functions from "firebase-functions";
 import { db } from "./firebaseAdmin.js"; // Import initialized Firebase Admin
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
