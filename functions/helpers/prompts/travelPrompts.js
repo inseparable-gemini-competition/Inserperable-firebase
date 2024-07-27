@@ -1,26 +1,32 @@
 // src/prompts/travelPrompts.js
 
-import { createPromptObject, getRandomSeed } from "../utils/promptUtils.js";
+import { createPromptObject } from "../utils/promptUtils.js";
 import { generateSchema } from "../generateSchema.js";
 
 export const getTabooPrompt = (inputData) => {
-  const prompt = `Using ${getRandomSeed()} as a seed, think of about max diverse cultural taboos you can for ${
+  const prompt = `think of about max diverse cultural taboos you can for ${
     inputData?.country || ""
-  }, select one random taboo, and describe it concisely in 3 lines or less, focusing on its significance and how travelers can respectfully avoid it. try to be diversified`;
+  }, select one random taboo, and describe it concisely in 3 lines or less, focusing on its significance and how travelers can respectfully avoid it. try to be diversified
+  your answer should be in ${inputData?.currentLanguage || "English"} language
+  `;
   return createPromptObject(prompt);
 };
 
 export const getTibsPrompt = (inputData) => {
-  const prompt = `Using ${getRandomSeed()} as a random seed, think of 100 unique travel tips for ${
+  const prompt = ` think of 100 unique travel tips for ${
     inputData?.selectedType || ""
   } in ${
     inputData?.country || ""
-  }. Then, select 3 truly random tips from this list. Ensure the tips are diverse and not commonly known. Provide only these 3 tips, keeping the total response under 150 words. Do not repeat tips from previous interactions.`;
+  }. Then, select 3 truly random tips from this list. Ensure the tips are diverse and not commonly known. Provide only these 3 tips, keeping the total response under 150 words. Do not repeat tips from previous interactions.
+  your answer should be in ${inputData?.currentLanguage || "English"} language
+  `;
   return createPromptObject(prompt);
 };
 
 export const getDonatePrompt = (inputData) => {
-  const prompt = `Tell me about donation entities or organizations you have to give url, name and description (6 exact lines) for the organization that could benefit from my donation in ${inputData?.country}`;
+  const prompt = `Tell me about donation entities or organizations you have to give url, name and description (6 exact lines) for the organization that could benefit from my donation in ${inputData?.country}
+  your answer should be in ${inputData?.currentLanguage || "English"} language
+  `;
   const schema = generateSchema("recommendation donation entity name", {
     name: ["string", "donation entity name"],
     websiteLink: ["string", "donation entity website link"],
@@ -30,7 +36,9 @@ export const getDonatePrompt = (inputData) => {
 };
 
 export const getSituationPrompt = (inputData) => {
-  const prompt = `I am in the following situation: ${inputData?.userSituation || ""}. What should I say in ${inputData?.country || ""} language?`;
+  const prompt = `I am in the following situation: ${inputData?.userSituation || ""}. What should I say in ${inputData?.country || ""} language?
+  your answer should be in ${inputData?.currentLanguage || "English"} language
+  `;
   return createPromptObject(prompt);
 };
 
@@ -48,6 +56,9 @@ export const getCountryRecommendationPrompt = (inputData) => {
   3. description: A concise overview of the country (50-75 words)
   4. mostFamousLandmark: Name of the most iconic landmark
   6. baseLanguage: Based on the user's base country (from question 1), provide his base language.
+
+  your answer should be in ${inputData?.currentLanguage || "English"} language
+
   `;
 
   const schema = generateSchema("recommendation for country or plan", {
@@ -75,6 +86,9 @@ Please provide the following information in your response:
 
 1. impactScore: Calculate the user's environmental impact score based on their answers.
 2. recommendations: Provide specific steps the user can take to reduce their environmental impact.
+
+your answer should be in ${inputData?.currentLanguage || "English"} language
+
 `;
 
   const schema = generateSchema("calculate environmental impact", {

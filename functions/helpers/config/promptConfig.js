@@ -13,6 +13,7 @@ export default {
   [PROMPT_TYPES.SITUATION]: { category: travelPrompts, functionName: 'getSituationPrompt' },
   [PROMPT_TYPES.TIBS]: { category: travelPrompts, functionName: 'getTibsPrompt' },
   [PROMPT_TYPES.TRANSLATE]: { category: languagePrompts, functionName: 'getTranslatePrompt' },
+  [PROMPT_TYPES.TRANSLATE_APP]: { category: languagePrompts, functionName: 'getTranslateAppPrompt' },
   [PROMPT_TYPES.SURVEY_QUESTION_COUNTRY]: { category: surveyPrompts, functionName: 'getNextQuestionCountryPrompt' },
   [PROMPT_TYPES.COUNTRY_RECOMMENDATION]: { category: travelPrompts, functionName: 'getCountryRecommendationPrompt' },
   [PROMPT_TYPES.ENVIRONMENTAL_IMPACT]: { category: travelPrompts, functionName: 'getEnvironmentalImpactPrompt' },

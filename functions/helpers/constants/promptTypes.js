@@ -12,4 +12,5 @@ export const PROMPT_TYPES = {
     ENVIRONMENTAL_IMPACT: 'environmentalImpact',
     NEXT_QUESTION_COUNTRY: 'nextQuestionCountry',
     NEXT_QUESTION_ENVIRONMENT: 'nextQuestionEnvironment',
+    TRANSLATE_APP: 'translateApp',
   };

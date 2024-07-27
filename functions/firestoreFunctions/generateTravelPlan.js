@@ -66,7 +66,6 @@ export const generateTravelPlan = functions.firestore
     const userData = snap.data();
     const country = userData.country;
     const genAI = new GoogleGenerativeAI(GEN_AI_KEY);
-
     const model = genAI.getGenerativeModel({
       model: "gemini-1.5-flash",
     });

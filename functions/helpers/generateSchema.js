@@ -1,6 +1,8 @@
+// schemaGenerator.js
+
 import { FunctionDeclarationSchemaType } from '@google/generative-ai';
 
-export const generateSchema = (description, properties) => {
+export const generateSchema = (description, properties, requiredKeys = []) => {
   const typeMap = {
     string: FunctionDeclarationSchemaType.STRING,
     number: FunctionDeclarationSchemaType.NUMBER,
@@ -10,7 +12,7 @@ export const generateSchema = (description, properties) => {
   };
 
   const schemaProperties = {};
-  const required = [];
+  const required = requiredKeys.length > 0 ? requiredKeys : [];
 
   for (const key in properties) {
     const prop = properties[key];
@@ -33,6 +35,7 @@ export const generateSchema = (description, properties) => {
       } else if (prop[0] === 'object') {
         const objectProperties = {};
         const nestedProperties = prop[3];
+        const nestedRequiredKeys = prop[4] || [];
         if (nestedProperties && typeof nestedProperties === 'object') {
           for (const nestedKey in nestedProperties) {
             const nestedProp = nestedProperties[nestedKey];
@@ -54,11 +57,8 @@ export const generateSchema = (description, properties) => {
           type: typeMap[prop[0]],
           description: prop[1],
           nullable: prop[2] ?? false,
-          items: {
-            type: FunctionDeclarationSchemaType.OBJECT,
-            properties: objectProperties,
-            required: Object.keys(objectProperties),
-          },
+          properties: objectProperties,
+          required: nestedRequiredKeys,
         };
       } else {
         schemaProperties[key] = {
@@ -68,17 +68,15 @@ export const generateSchema = (description, properties) => {
         };
       }
     }
-    required.push(key);
+    if (requiredKeys.length === 0) {
+      required.push(key);
+    }
   }
 
   return {
     description: description,
-    type: FunctionDeclarationSchemaType.ARRAY,
-    items: {
-      type: FunctionDeclarationSchemaType.OBJECT,
-      properties: schemaProperties,
-      required: required,
-    },
+    type: FunctionDeclarationSchemaType.OBJECT,
+    properties: schemaProperties,
+    required: required,
   };
 };
-

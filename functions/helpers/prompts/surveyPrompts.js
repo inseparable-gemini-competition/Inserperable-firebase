@@ -2,7 +2,7 @@
 
 import { createPromptObject } from "../utils/promptUtils.js";
 
-export const getNextQuestionCountryPrompt = () => {
+export const getNextQuestionCountryPrompt = (inputData) => {
   const prompt = `Generate a series of diverse, creative questions to help recommend a country for the user to visit, excluding their base country. Each question should be based on previous answers and presented as a JSON object. Continue asking questions until explicitly told to stop.
   Rules:
   1. Never ask about the user's base country again.
@@ -35,12 +35,15 @@ export const getNextQuestionCountryPrompt = () => {
   
   Tailor subsequent questions based on previous responses to build a comprehensive traveler profile. Aim for a mix of specific and broad questions to gather diverse information for making an informed country recommendation.
   And again it's curcial to respond only with JSON
+
+  your answer should be in ${inputData?.currentLanguage || "English"} language
+
   `;
 
   return createPromptObject(prompt);
 };
 
-export const getNextQuestionEnvironmentPrompt = () => {
+export const getNextQuestionEnvironmentPrompt = (inputData) => {
   const prompt = `Generate a series of questions to help calculate the user's environmental impact for their travel plans. Each question should be based on previous answers and presented as a JSON object. Continue asking questions until explicitly told to stop.
   Rules:
   1. Use simple English.
@@ -71,6 +74,9 @@ export const getNextQuestionEnvironmentPrompt = () => {
   
   Tailor subsequent questions based on previous responses to build a comprehensive profile of the user's travel plans. Aim for a mix of specific and broad questions to gather diverse information for making an informed impact calculation.
   And again it's curcial to respond only with JSON
+
+  your answer should be in ${inputData?.currentLanguage || "English"} language
+
   `;
 
   return createPromptObject(prompt);
