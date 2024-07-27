@@ -9,6 +9,7 @@ import {
   generateJsonContent,
   generateStreamContent,
   generateText,
+  scheduleTrip,
 } from "./httpsFunctions/index.js";
 
 // Export functions
@@ -20,4 +21,5 @@ export {
   generateJsonContent,
   generateStreamContent,
   generateText,
+  scheduleTrip,
 };

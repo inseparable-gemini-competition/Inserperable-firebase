@@ -233,7 +233,6 @@ export const generateTravelPlan = functions.firestore
       });
 
       const rawResponse = result.response.text();
-      console.log("Raw AI response:", rawResponse);
 
       const cleanedResponse = cleanupJSON(rawResponse);
       return JSON.parse(cleanedResponse);
