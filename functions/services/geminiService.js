@@ -1,78 +1,102 @@
- // functions/services/geminiService.js
+// functions/services/geminiService.js
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import * as functions from 'firebase-functions';
+import { generateSchema } from '../helpers/generateSchema.js';
+
 
 const GEN_AI_KEY = functions.config().genai.apikey;
-
 const geminiAI = new GoogleGenerativeAI(GEN_AI_KEY);
 
-const cleanupJSON = (jsonString) => {
-  const start = jsonString.indexOf('{');
-  const end = jsonString.lastIndexOf('}');
-  
-  if (start === -1 || end === -1) {
-    throw new Error("No valid JSON object found in the response");
+const constructSearchPhraseSchema = generateSchema(
+  "Output for constructed search phrase",
+  {
+    mood: ["string", "Extracted mood"],
+    desires: ["string", "Extracted desires"],
+    searchPhrase: ["string", "Constructed search phrase"]
   }
-  
-  return jsonString.slice(start, end + 1);
-};
+);
 
-export const processUserInput = async (input) => {
-  const model = geminiAI.getGenerativeModel({ model: "gemini-1.5-pro" });
-  console.log('Processing user input:', input);
+export const constructSearchPhrase = async (userMoodAndDesires, country) => {
+  console.log('Constructing search phrase:', userMoodAndDesires, country);
+  const model = geminiAI.getGenerativeModel({ 
+    model: "gemini-1.5-pro",
+    generationConfig: {
+      temperature: 0.7,
+      topK: 40,
+      topP: 0.95,
+      maxOutputTokens: 1024,
+      responseMimeType: "application/json",
+      responseSchema: constructSearchPhraseSchema,
+    },
+  });
   const prompt = `
-    Analyze the following free-form text and extract location information where the user is likely referring to place names for destination:
-  
-    ${input}
-  
-    The text may contain noise or irrelevant information. The model should attempt to extract the most likely place names for the destination. If the exact place names are not found, try to identify the nearest known locations based on the available information.
-  
-    Please provide:
-    1. The most likely place name for the destination (string). If the exact place name is not found, provide the nearest known location.
-    3. Any additional context about the locations, such as landmarks or cross streets (string or null)
-  
-    If absolutely no location information can be extracted, return null for the destination fields.
-  
-    Format the response as a JSON object with the following keys:
+    Analyze the following user input:
+    "${userMoodAndDesires}"
+
+    Extract the user's mood, desires, and any other relevant information. Then, construct a search phrase for finding a place to visit that would suit these factors.
+    The phrase should be concise and suitable for a place search API. The place should be in the user's country: ${country}.
+
+    Return your response in the following JSON format:
     {
-      "destination": string | null,
-      "additionalContext": string | null
+      "mood": "Extracted mood",
+      "desires": "Extracted desires",
+      "searchPhrase": "Constructed search phrase"
     }
+
+    Return only the JSON object, without any additional text or explanation.
   `;
 
   try {
-    const result = await model.generateContent([prompt]);
-    console.log('result ', result, result.response.text());
-
-    const cleanedResponse = cleanupJSON(result.response.text());
-    return JSON.parse(cleanedResponse);
+    const result = await model.generateContent(prompt);
+    return JSON.parse(result.response.text());
   } catch (error) {
-    console.error('Error processing user input with Gemini:', error);
-    throw new Error('Failed to process user input');
+    console.error('Error constructing search phrase:', error);
+    throw new Error('Failed to construct search phrase');
   }
 };
 
-export const processTripWithGemini = async ( destination, priceEstimate) => {
-  const model = geminiAI.getGenerativeModel({ model: "gemini-1.5-pro" });
-  const prompt = `
-    Analyze the following trip details and provide insights:
-    Destination: ${destination.formattedAddress}
-    Estimated Price: ${priceEstimate.estimate}
-    Estimated Duration: ${priceEstimate.duration} seconds
+const recommendBestPlaceSchema = generateSchema(
+  "Output for recommended best place",
+  {
+    name: ["string", "Name of the recommended place"],
+    description: ["string", "Description of why this place is recommended"]
+  }
+);
 
-    Please provide:
-    1. A brief description of the trip
-    2. Any potential traffic or weather concerns
-    3. Suggestions for the best time to travel
-    4. Any points of interest along the route
+export const recommendBestPlace = async (searchResults, originalUserInput, country) => {
+  const model = geminiAI.getGenerativeModel({ 
+    model: "gemini-1.5-pro",
+    generationConfig: {
+      temperature: 0.7,
+      topK: 40,
+      topP: 0.95,
+      maxOutputTokens: 1024,
+      responseMimeType: "application/json",
+      responseSchema: recommendBestPlaceSchema,
+    },
+  });
+  const prompt = `
+    Given the following list of places:
+    ${JSON.stringify(searchResults, null, 2)}
+
+    And considering the original user input:
+    "${originalUserInput}" and the country is ${country}.
+
+    Recommend the best place to visit that aligns with the user's mood and desires. Provide your recommendation in the following JSON format:
+    {
+      "name": "Name of the recommended place",
+      "description": "A brief description of why this place is recommended, relating it to the user's mood and desires"
+    }
+
+    Return only the JSON object, without any additional text or explanation.
   `;
 
   try {
-    const result = await model.generateContent([prompt]);
-    return result.response.text();
+    const result = await model.generateContent(prompt);
+    return JSON.parse(result.response.text());
   } catch (error) {
-    console.error('Error processing trip details with Gemini:', error);
-    throw new Error('Failed to process trip details');
+    console.error('Error recommending best place:', error);
+    throw new Error('Failed to recommend best place');
   }
 };

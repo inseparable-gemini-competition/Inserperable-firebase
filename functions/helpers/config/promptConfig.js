@@ -19,4 +19,7 @@ export default {
   [PROMPT_TYPES.ENVIRONMENTAL_IMPACT]: { category: travelPrompts, functionName: 'getEnvironmentalImpactPrompt' },
   [PROMPT_TYPES.NEXT_QUESTION_COUNTRY]: { category: surveyPrompts, functionName: 'getNextQuestionCountryPrompt' },
   [PROMPT_TYPES.NEXT_QUESTION_ENVIRONMENT]: { category: surveyPrompts, functionName: 'getNextQuestionEnvironmentPrompt' },
+  [PROMPT_TYPES.AUDIO_TRANSCRIPTION]: { category: languagePrompts, functionName: 'getAudioTranscriptionPrompt' },
+  [PROMPT_TYPES.AUDIO_COMMAND]: { category: languagePrompts, functionName: 'getAudioCommandPrompt' },
+
 };
