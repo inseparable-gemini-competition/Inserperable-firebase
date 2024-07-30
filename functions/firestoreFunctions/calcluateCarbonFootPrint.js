@@ -1,6 +1,7 @@
 import * as functions from "firebase-functions";
 import { db } from "../helpers/firebaseAdmin.js"; // Import initialized Firebase Admin
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { getFriendlyErrorMessage } from "../helpers/utils/errorHandler.js";
 
 const GEN_AI_KEY = functions.config().genai.apikey;
 
@@ -43,7 +44,7 @@ export const calculateCarbonFootprint = functions.firestore
       const carbonFootprint =
         result?.response.candidates[0].content.parts[0].text || "";
 
-        const adviceQuery = `
+      const adviceQuery = `
         Provide concise, actionable advice to reduce the carbon footprint of the following product:
         
         Product Details:
@@ -66,8 +67,8 @@ export const calculateCarbonFootprint = functions.firestore
         
         Format your response as a numbered list of concise bullet points. Aim for clarity and actionability in your advice.
         `;
-        
-        const adviceResult = await model.generateContent([adviceQuery]);
+
+      const adviceResult = await model.generateContent([adviceQuery]);
 
       const reductionAdvice =
         adviceResult?.response.candidates[0].content.parts[0].text || "";
@@ -77,6 +78,11 @@ export const calculateCarbonFootprint = functions.firestore
         reductionAdvice,
       });
     } catch (error) {
-      console.error("Error calculating carbon footprint:", error);
+      const friendlyMessage = getFriendlyErrorMessage(
+        "Error generating content:",
+        error
+      );
+      throw new functions.https.HttpsError("internal", friendlyMessage);
     }
   });
+

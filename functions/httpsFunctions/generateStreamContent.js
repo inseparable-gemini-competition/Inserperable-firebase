@@ -1,6 +1,7 @@
 import functions from "firebase-functions";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getPrompts } from "../helpers/getPrompts.js";
+import { getFriendlyErrorMessage } from "../helpers/utils/errorHandler.js";
 
 const API_KEY = functions.config().genai.apikey;
 
@@ -50,9 +51,8 @@ export const generateStreamContent = functions.https.onCall(async (data) => {
 
     return { result };
   } catch (error) {
-    throw new functions.https.HttpsError(
-      "internal",
-      "Error generating content: " + JSON.stringify(error)
-    );
+    const friendlyMessage = getFriendlyErrorMessage("Error generating content:", error);
+    throw new functions.https.HttpsError("internal", friendlyMessage);
   }
 });
+

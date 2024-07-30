@@ -1,6 +1,7 @@
 import functions from "firebase-functions";
 import { db } from "../helpers/firebaseAdmin.js"; // Import initialized Firebase Admin
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { getFriendlyErrorMessage } from "../helpers/utils/errorHandler.js";
 
 const GEN_AI_KEY = functions.config().genai.apikey;
 
@@ -8,18 +9,18 @@ export const translateMessage = functions.firestore
   .document("chatRooms/{roomId}/messages/{messageId}")
   .onCreate(async (snap, context) => {
     const message = snap.data();
-    const userId = message.userId; 
+    const userId = message.userId;
     const roomId = context.params.roomId;
 
     try {
       // Extract user IDs from roomId
-      const [userA, userB] = roomId.split('_');
+      const [userA, userB] = roomId.split("_");
       const otherUserId = userId === userA ? userB : userA;
 
       // Fetch the base languages for both users
       const otherUserDoc = await db.collection("users").doc(otherUserId).get();
       const otherUser = otherUserDoc.data();
-      const otherBaseLanguage = otherUser?.baseLanguage || 'en'; // Default to 'en' if baseLanguage is not found
+      const otherBaseLanguage = otherUser?.baseLanguage || "en"; // Default to 'en' if baseLanguage is not found
 
       // Initialize Google Generative AI model
       const genAI = new GoogleGenerativeAI(GEN_AI_KEY);
@@ -43,6 +44,10 @@ export const translateMessage = functions.firestore
         .doc(context.params.messageId)
         .update({ translatedText });
     } catch (error) {
-      console.error("Error translating message:", error);
+      const friendlyMessage = getFriendlyErrorMessage(
+        "Error generating content:",
+        error
+      );
+      throw new functions.https.HttpsError("internal", friendlyMessage);
     }
   });
