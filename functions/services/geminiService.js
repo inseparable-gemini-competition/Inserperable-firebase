@@ -20,7 +20,7 @@ const constructSearchPhraseSchema = generateSchema(
 export const constructSearchPhrase = async (userMoodAndDesires, country) => {
   console.log('Constructing search phrase:', userMoodAndDesires, country);
   const model = geminiAI.getGenerativeModel({ 
-    model: "gemini-1.5-pro",
+    model: "gemini-1.5-flash",
     generationConfig: {
       temperature: 0.7,
       topK: 40,
@@ -66,7 +66,7 @@ const recommendBestPlaceSchema = generateSchema(
 
 export const recommendBestPlace = async (searchResults, originalUserInput, country) => {
   const model = geminiAI.getGenerativeModel({ 
-    model: "gemini-1.5-pro",
+    model: "gemini-1.5-flash",
     generationConfig: {
       temperature: 0.7,
       topK: 40,

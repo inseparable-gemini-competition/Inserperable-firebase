@@ -3,7 +3,7 @@
 import { createPromptObject } from "../utils/promptUtils.js";
 
 export const getNextQuestionCountryPrompt = (inputData) => {
-  const prompt = `
+  const prompt = ` according to the previous answers which is: ${inputData.answers} and questions which is ${inputData.questions}, ask the next question to recommend a country to visit 
 As an AI travel survey assistant, generate the next question in a series to help recommend a country for the user to visit, excluding their base country. Each question should be tailored based on previous answers and presented as a JSON object.
 
 Guidelines:
@@ -14,6 +14,7 @@ Guidelines:
 5. Prefer multiple-choice questions over open-ended ones.
 6. Ensure to ask about budget at some point in the survey.
 7. Provide only the JSON response, nothing more or less.
+8. use wide variation of questions.
 
 JSON Structure:
 {
@@ -42,6 +43,8 @@ Tailor each new question based on previous responses to build a comprehensive tr
 Your response should be in the ${inputData?.currentLanguage || "English"} language.
 
 If you encounter any issues or if the input data is insufficient, respond with a JSON object containing an "error" field explaining the issue.
+
+always check the context and check what you asked and aske the rest of questions, and make sure to ask about the budget, climate, activity, cultural, and travel preferences.
 `;
 
   return createPromptObject(prompt);
@@ -52,7 +55,7 @@ If you encounter any issues or if the input data is insufficient, respond with a
 
 export const getNextQuestionEnvironmentPrompt = (inputData) => {
   const prompt = `
-As an AI environmental impact assessor, generate the next question in a series to help calculate the user's environmental impact for today's travel activities. Each question should be tailored based on previous answers and presented as a JSON object.
+  according to the previous answers which is: ${inputData.answers} to these questions which is ${inputData.questions}, generate the next question in a series to help calculate the user's environmental impact for today's travel activities. Each question should be tailored based on previous answers and presented as a JSON object.
 
 Guidelines:
 1. Use simple, clear language accessible to a wide audience.
@@ -60,6 +63,7 @@ Guidelines:
 3. Prefer multiple-choice questions over open-ended ones.
 4. Include questions about today's transportation, food choices, activities, energy use, and waste generation.
 5. Provide only the JSON response, nothing more or less.
+6. make sure not to repeat questions
 
 JSON Structure:
 {
@@ -85,7 +89,7 @@ Example question types:
 
 Tailor each new question based on previous responses to build a comprehensive profile of the user's activities and choices for today. Aim for questions that will provide the most relevant information for calculating today's environmental impact.
 
-Your response should be in the ${inputData?.currentLanguage || "English"} language.
+Your response should be in the ${inputData?.currentLanguage || "English"} language. that's a very curcial part of the survey.
 
 If you encounter any issues or if the input data is insufficient, respond with a JSON object containing an "error" field explaining the issue.
 `;

@@ -26,7 +26,7 @@ export const generateText = functions.https.onCall(async (data) => {
   const genAI = new GoogleGenerativeAI(functions.config().genai.apikey);
 
   const model = genAI.getGenerativeModel({
-    model: modelType ?? "gemini-1.5-pro",
+    model: modelType ?? "gemini-1.5-flash",
     safetySettings: [
       {
         category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,

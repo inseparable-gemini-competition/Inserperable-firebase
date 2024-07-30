@@ -29,15 +29,24 @@ export const getAudioTranscriptionPrompt = (inputData) => {
 };
 
 const KEYWORDS = [
-  'identify', 'price', 'read', 'donate', 'taboo',
-  'mood', 'say', 'plan', 'shop', 'impact', 'tips'
+  "identify",
+  "price",
+  "read",
+  "donate",
+  "taboo",
+  "mood",
+  "say",
+  "plan",
+  "shop",
+  "impact",
+  "tips",
 ];
 export const getAudioCommandPrompt = () => {
   const prompt = `
   Analyze the provided audio file and do the following:
   1. Transcribe and understand the content.
   2. Check if it contains any of these keywords or their meanings:
-     ${KEYWORDS.join(', ')}
+     ${KEYWORDS.join(", ")}
   
   Return only the matched keyword from the list above.
   If no keyword matches, return "none".
@@ -50,7 +59,7 @@ export const getTranslateAppPrompt = (inputData) => {
 
   const prompt = `
 Translate the values for keys in the 'translations' field of the schema to the language of ${country}.
-Also, set 'baseLanguage' as the language code for ${country}.
+Also, set 'baseLanguage' as the language code for ${country}, and isRTl which is the language write direction
 
 Please adhere to the following guidelines:
 1. Maintain a consistent tone and style across all translations.
@@ -64,6 +73,7 @@ Translation instructions:
   // Define the schema structure with optimized readability
   const schema = generateSchema(prompt, {
     baseLanguage: ["string", "Base language code (e.g., 'en' for English)"],
+    isRTl: ["boolean", "Is the language RTL?"],
     translations: [
       "object",
       "Object containing all translation keys",
@@ -75,6 +85,12 @@ Translation instructions:
         read: ["string", "Translate: 'Read'"],
         donate: ["string", "Translate: 'Donate'"],
         plan: ["string", "Translate: 'Plan'"],
+        tips: ["string", "Translate: 'Tips'"],
+        taboo: ["string", "Translate: 'Taboo'"],
+        mood: ["string", "Translate: 'Mood'"],
+        tellUsYourMood: ["string", "Translate: 'Tell us your mood'"],
+        enterMoodAndDesires: ["string", "Translate: 'Enter mood and desires'"],
+        findPlace: ["string", "Translate: 'Find Place'"],
         shop: ["string", "Translate: 'Shop'"],
         close: ["string", "Translate: 'Close'"],
         cancel: ["string", "Translate: 'Cancel'"],
@@ -152,10 +168,50 @@ Translation instructions:
           "string",
           "Translate: 'Your Environmental Impact Score'",
         ],
-        recommedning: ["string", "Translate: 'Recommending'"],
+        recommending: ["string", "Translate: 'Recommending'"],
       },
     ],
   });
 
   return createPromptObject(prompt, schema);
+};
+
+// Return the prompt object with the schema
+export const getTranslatePriorityWordsPrompt = (inputData) => {
+  const country = inputData?.country;
+
+  const prompt = `
+  Translate the values for keys in the 'translations' field of the schema to the language of ${country}.
+  Also, set 'baseLanguage' as the language code for ${country}.
+  
+  Please adhere to the following guidelines:
+  1. Maintain a consistent tone and style across all translations.
+  2. Consider cultural context and local idioms when translating.
+  3. For words that may have different forms (singular/plural or gender-specific), provide the most commonly used form.
+  4. If a direct translation is not suitable, provide a culturally appropriate alternative and add a comment explaining the change.
+  
+  Translation instructions:
+  `;
+
+  // Define the schema structure with optimized readability
+  const schema = generateSchema(prompt, {
+    baseLanguage: ["string", "Base language code (e.g., 'en' for English)"],
+    translations: [
+      "object",
+      "Object containing all translation keys",
+      false,
+      {
+        close: ["string", "Translate: 'Close'"],
+        cancel: ["string", "Translate: 'Cancel'"],
+        finish: ["string", "Translate: 'Finish'"],
+        previous: ["string", "Translate: 'Previous'"],
+        next: ["string", "Translate: 'Next'"],
+        recommending: ["string", "Translate: 'Recommending'"],
+        fetchingNextQuestion: ["string", "Translate: 'Fetching Next Question'"],
+      },
+    ],
+  });
+
+  return createPromptObject(prompt, schema);
+
 };
