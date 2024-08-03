@@ -27,11 +27,13 @@ const fetchPhotoUrl = async (description) => {
       }
     );
     if (response.data.items && response.data.items.length > 0) {
+      functions.logger.info(`Photo URL fetched for ${description}`);
       return response.data.items[0].link;
     }
+    functions.logger.warn(`No photo found for ${description}`);
     return null;
   } catch (error) {
-    console.error(`Error fetching photo for ${description}:`, error);
+    functions.logger.error(`Error fetching photo for ${description}: ${error.message}`, { error });
     return null;
   }
 };
@@ -56,7 +58,7 @@ const retryOperation = async (operation, retries = 0) => {
     if (retries >= MAX_RETRIES) {
       throw error;
     }
-    console.log(`Attempt ${retries + 1} failed. Retrying...`);
+    functions.logger.warn(`Attempt ${retries + 1} failed. Retrying...`);
     await wait(INITIAL_RETRY_DELAY * Math.pow(2, retries));
     return retryOperation(operation, retries + 1);
   }
@@ -67,6 +69,7 @@ export const generateTravelPlan = functions.firestore
   .onCreate(async (snap, context) => {
     const userData = snap.data();
     const country = userData.country;
+    functions.logger.info(`Generating travel plan for user: ${context.params.userId}, country: ${country}`);
     const genAI = new GoogleGenerativeAI(GEN_AI_KEY);
 
     const model = genAI.getGenerativeModel({
@@ -193,8 +196,13 @@ export const generateTravelPlan = functions.firestore
           ],
           ...
         }
+
+        Guideline:
+        - all the text has to be in ${userData?.baseLanguage} language
+        - all the places have to be real place that will have latitude and longitude
       `;
 
+      functions.logger.info(`Sending query to Generative AI: ${query}`);
       const result = await model.generateContent({
         contents: [{ role: "user", parts: [{ text: query }] }],
         generationConfig: {
@@ -203,7 +211,7 @@ export const generateTravelPlan = functions.firestore
       });
 
       const rawResponse = result.response.text();
-      console.log("Raw AI response:", rawResponse);
+      functions.logger.info("Raw AI response received", { rawResponse });
 
       const cleanedResponse = cleanupJSON(rawResponse);
       return JSON.parse(cleanedResponse);
@@ -211,6 +219,7 @@ export const generateTravelPlan = functions.firestore
 
     try {
       const travelPlan = await retryOperation(generateAndParseTravelPlan);
+      functions.logger.info("Generated travel plan", { travelPlan });
 
       const latLongAndPhotoPromises = [];
       for (const mood in travelPlan) {
@@ -233,9 +242,9 @@ export const generateTravelPlan = functions.firestore
         travelPlan,
       });
 
-      console.log("Travel plan saved successfully!");
+      functions.logger.info("Travel plan saved successfully!", { userId: context.params.userId });
     } catch (error) {
-      console.error("Error generating travel plan after all retries:", error);
+      functions.logger.error("Error generating travel plan after all retries:", { error });
       await db.collection("users").doc(context.params.userId).update({
         travelPlanError: error.message,
       });
@@ -255,15 +264,12 @@ const getLatLong = async (placeName) => {
     );
 
     if (response.data.status !== "OK") {
-      console.error(
-        `Geocoding API error for ${placeName}: ${response.data.status}`
-      );
-      console.error("Full response:", JSON.stringify(response.data, null, 2));
+      functions.logger.error(`Geocoding API error for ${placeName}: ${response.data.status}`, { response: response.data });
       return { latitude: null, longitude: null };
     }
 
     if (response.data.results.length === 0) {
-      console.error(`No results found for ${placeName}`);
+      functions.logger.warn(`No results found for ${placeName}`);
       return { latitude: null, longitude: null };
     }
 
@@ -273,15 +279,16 @@ const getLatLong = async (placeName) => {
       typeof location.lat !== "number" ||
       typeof location.lng !== "number"
     ) {
-      console.error(`Invalid location data for ${placeName}:`, location);
+      functions.logger.error(`Invalid location data for ${placeName}`, { location });
       return { latitude: null, longitude: null };
     }
 
+    functions.logger.info(`Lat/Long fetched for ${placeName}`, { location });
     return { latitude: location.lat, longitude: location.lng };
   } catch (error) {
-    console.error(`Error fetching lat/long for ${placeName}:`, error);
+    functions.logger.error(`Error fetching lat/long for ${placeName}: ${error.message}`, { error });
     if (error.response) {
-      console.error("Error response:", error.response.data);
+      functions.logger.error("Error response from Geocoding API", { response: error.response.data });
     }
     return { latitude: null, longitude: null };
   }

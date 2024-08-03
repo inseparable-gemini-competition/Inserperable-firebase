@@ -12,11 +12,11 @@ export const getFriendlyErrorMessage = (error) => {
     'default': "Something unexpected happened. Let's try that again, shall we?"
   };
 
-  if (error.message.includes('geocod')) return errorMessages.geocoding;
-  if (error.message.includes('Uber') || error.message.includes('estimate')) return errorMessages.uber_estimate;
-  if (error.message.includes('Gemini') || error.message.includes('AI')) return errorMessages.gemini_processing;
-  if (error.message.includes('schedul')) return errorMessages.trip_scheduling;
-  if (error.message.includes('calendar')) return errorMessages.calendar;
+  if (error.message?.includes('geocod')) return errorMessages.geocoding;
+  if (error.message?.includes('Uber') || error.message.includes('estimate')) return errorMessages.uber_estimate;
+  if (error.message?.includes('Gemini') || error.message.includes('AI')) return errorMessages.gemini_processing;
+  if (error.message?.includes('schedul')) return errorMessages.trip_scheduling;
+  if (error.message?.includes('calendar')) return errorMessages.calendar;
 
   return errorMessages.default;
 };

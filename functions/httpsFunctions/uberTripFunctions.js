@@ -18,7 +18,7 @@ export const scheduleTrip = functions.https.onCall(async (data) => {
     console.log('Search results:', searchResults);
 
     // Step 3: Use Gemini to recommend best place
-    const recommendation = await recommendBestPlace(searchResults, userInput.userMoodAndDesires, userInput.country);
+    const recommendation = await recommendBestPlace(searchResults, userInput.userMoodAndDesires, userInput.country, userInput?.currentLanguage);
     console.log('Recommended place:', recommendation);
 
     // Step 4: Get lat and long for the recommended place

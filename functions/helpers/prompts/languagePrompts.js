@@ -23,10 +23,6 @@ Translated text:
   return createPromptObject(prompt);
 };
 
-export const getAudioTranscriptionPrompt = (inputData) => {
-  const prompt = `I will send you audio and you translate it from ${inputData?.fromLanguage} language to ${inputData?.toLanguage} language`;
-  return createPromptObject(prompt);
-};
 
 const KEYWORDS = [
   "identify",
@@ -142,12 +138,12 @@ Translation instructions:
         handmadeItems: ["string", "Translate: 'Handmade Items'"],
         carbonFootprint: ["string", "Translate: 'Carbon Footprint'"],
         contactSeller: ["string", "Translate: 'Contact Seller'"],
-        environmentalImpact: ["string", "Translate: 'Env Impact'"],
+        environmentalImpact: ["string", "Translate: 'Daily Environment Test'"],
 
         // Error and Status Messages
         fetchError: ["string", "Translate: Fetch error message"],
         noHandmadeItems: ["string", "Translate: 'No handmade items available'"],
-        noDataAvailable: ["string", "Translate: 'No data available' message"],
+        noDataAvailable: ["string", "Translate: 'We are cooking up something for you, wait for a while and try again'"],
 
         // User Interaction Prompts
         whatToSay: ["string", "Translate: 'What to say?'"],
@@ -169,6 +165,33 @@ Translation instructions:
           "Translate: 'Your Environmental Impact Score'",
         ],
         recommending: ["string", "Translate: 'Recommending'"],
+        ecofriendly: ["string", "Translate: 'Eco Friendly"],
+        cultural: ["string", "Translate: 'Cultural'"],
+        cuisine: ["string", "Translate: 'Cuisine'"],
+        safety: ["string", "Translate: 'Safety'"],
+        submit: ["string", "Translate: 'Submit'"],
+        findingPerfectPlace: ["string", "Translate: 'Finding Perfect Place'"],
+        viewOnMap: ["string", "Translate: 'View on Map'"],
+        openInUber: ["string", "Translate: 'Open in Uber'"],
+        weRecommend: ["string", "Translate: 'We Recommend'"],
+        Whattransportationdidyouusetoday: ["string", "Translate: 'What transportation did you use today?'"],
+        airplane: ["string", "Translate: 'Airplane'"],
+        car: ["string", "Translate: 'Car'"],
+        bicycle: ["string", "Translate: 'Bicycle'"],
+        walking: ["string", "Translate: 'Walking'"],
+        nothing: ["string", "Translate: 'Nothing'"],
+        pleaseStartSpeakingAndLongPresToStop: ["string", "Translate: 'Please start speaking and long press to stop'"],
+        processing: ["string", "Translate: 'Processing'"],
+        identifiedCategory: ["string", "Translate: 'Identified Category'"],
+        unidentifiedCategory: ["string", "Translate: 'Unidentified Category'"],
+        visiting: ["string", "Translate: 'Visiting'"],
+        notVisiting: ["string", "Translate: 'Not Visiting'"],
+        impactScore: ["string", "Translate: 'Impact Score'"],
+        whereAreYouBased: ["string", "Translate: 'Where are you based?'"],
+        areYouCurrentlyTraveling: ["string", "Translate: 'Are you currently traveling?'"],
+        whereAreYouNow: ["string", "Translate: 'Where are you now?'"],
+        yes:  ["string", "Translate: 'Yes'"],
+        no:  ["string", "Translate: 'No'"],
       },
     ],
   });
@@ -208,6 +231,11 @@ export const getTranslatePriorityWordsPrompt = (inputData) => {
         next: ["string", "Translate: 'Next'"],
         recommending: ["string", "Translate: 'Recommending'"],
         fetchingNextQuestion: ["string", "Translate: 'Fetching Next Question'"],
+        whereAreYouBased: ["string", "Translate: 'Where are you based?'"],
+        areYouCurrentlyTraveling: ["string", "Translate: 'Are you currently traveling?'"],
+        whereAreYouNow: ["string", "Translate: 'Where are you now?'"],
+        yes:  ["string", "Translate: 'Yes'"],
+        no:  ["string", "Translate: 'No'"],
       },
     ],
   });

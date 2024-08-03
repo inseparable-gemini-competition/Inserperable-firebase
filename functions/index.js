@@ -10,6 +10,8 @@ import {
   generateStreamContent,
   generateText,
   scheduleTrip,
+  getUserScore,
+  updateUserScore
 } from "./httpsFunctions/index.js";
 
 // Export functions
@@ -22,4 +24,6 @@ export {
   generateStreamContent,
   generateText,
   scheduleTrip,
+  getUserScore,
+  updateUserScore
 };

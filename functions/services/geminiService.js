@@ -64,7 +64,7 @@ const recommendBestPlaceSchema = generateSchema(
   }
 );
 
-export const recommendBestPlace = async (searchResults, originalUserInput, country) => {
+export const recommendBestPlace = async (searchResults, originalUserInput, country, currentLanguage) => {
   const model = geminiAI.getGenerativeModel({ 
     model: "gemini-1.5-flash",
     generationConfig: {
@@ -83,10 +83,12 @@ export const recommendBestPlace = async (searchResults, originalUserInput, count
     And considering the original user input:
     "${originalUserInput}" and the country is ${country}.
 
+    you must respond in ${currentLanguage} language. if failed for any reason detect user language in the text: "${originalUserInput}"  and respond according to it
+
     Recommend the best place to visit that aligns with the user's mood and desires. Provide your recommendation in the following JSON format:
     {
       "name": "Name of the recommended place",
-      "description": "A brief description of why this place is recommended, relating it to the user's mood and desires"
+      "description": A 6-7 lines description of why this place is recommended, relating it to the user's mood and desires, it must be in ${currentLanguage} or detect ${originalUserInput} language and respond in the same language"
     }
 
     Return only the JSON object, without any additional text or explanation.

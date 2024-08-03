@@ -54,45 +54,37 @@ always check the context and check what you asked and aske the rest of questions
 
 
 export const getNextQuestionEnvironmentPrompt = (inputData) => {
+  const country = inputData?.country || "the country you are visiting";
+
   const prompt = `
-  according to the previous answers which is: ${inputData.answers} to these questions which is ${inputData.questions}, generate the next question in a series to help calculate the user's environmental impact for today's travel activities. Each question should be tailored based on previous answers and presented as a JSON object.
+  these questions are already asked ${JSON.stringify(inputData?.questions)}, generate the next engaging and innovative question in a series to assess the user's daily environmental impact while traveling in ${country}.
 
-Guidelines:
-1. Use simple, clear language accessible to a wide audience.
-2. Focus on today's activities and choices that significantly affect environmental impact.
-3. Prefer multiple-choice questions over open-ended ones.
-4. Include questions about today's transportation, food choices, activities, energy use, and waste generation.
-5. Provide only the JSON response, nothing more or less.
-6. make sure not to repeat questions
+  As an AI environment impact survey assistant while traveling, your task is to create the next question in a series of 7 questions, ensuring no repetition and maintaining high engagement.
 
-JSON Structure:
-{
-  "id": number,
-  "question": string,
-  "options": [
-    {
-      "id": number,
-      "option": string
-    }
-  ],
-  "isOpenEnded": boolean
-}
+  Guidelines:
+  1. Use simple, clear language accessible to a wide audience.
+  2. Focus on today's activities and choices that significantly affect the user's environmental impact.
+  3. Prefer multiple-choice questions over open-ended ones.
+  4. Provide only the JSON response, nothing more or less.
+  5. Ensure no questions are repeated.
+  6. Your response should be in the ${inputData?.currentLanguage || "English"} language.
+  7. Always include "Nothing" as an option in the multiple-choice questions.
 
-For multiple-choice questions, provide 3-5 options. For open-ended questions, set "options" to an empty array and "isOpenEnded" to true.
+  JSON Structure:
+  {
+    "id": number,
+    "question": string,
+    "options": [
+      {
+        "id": number,
+        "option": string
+      }
+    ],
+    "isOpenEnded": boolean
+  }
 
-Example question types:
-1. Today's transportation: "How have you primarily moved around today: walking/cycling, public transport, private car, or tour bus?"
-2. Today's meals: "Where have you had most of your meals today: local restaurants, hotel buffet, fast food chains, or self-prepared?"
-3. Today's main activity: "What has been your main activity today: city sightseeing, beach visit, nature excursion, or indoor attraction?"
-4. Today's energy use: "How much have you used air conditioning or heating in your accommodation today: not at all, a few hours, most of the day, or continuously?"
-5. Today's waste generation: "How many disposable items (e.g., plastic bottles, packaging) have you used today: none, 1-3 items, 4-6 items, or more than 6?"
-
-Tailor each new question based on previous responses to build a comprehensive profile of the user's activities and choices for today. Aim for questions that will provide the most relevant information for calculating today's environmental impact.
-
-Your response should be in the ${inputData?.currentLanguage || "English"} language. that's a very curcial part of the survey.
-
-If you encounter any issues or if the input data is insufficient, respond with a JSON object containing an "error" field explaining the issue.
-`;
+  If you encounter any issues or if the input data is insufficient, respond with a JSON object containing an "error" field explaining the issue.
+  `;
 
   return createPromptObject(prompt);
 };

@@ -8,7 +8,7 @@ export const getTabooPrompt = (inputData) => {
 You are a culturally sensitive AI assistant helping travelers understand and respect local customs. Based on the traveler's destination (${inputData?.country || "unspecified country"}), your task is to:
 
 1. Generate a list of 10 diverse cultural taboos or sensitive topics for this country. if you didn't find any taboo, you can mention any cultural insight and state that it's not a taboo.
-2. Select one (only one) random taboo from this list.
+2. Select one (only one) random taboo from this list, and don't render all the 10 taboos. just only one.
 3. Describe the selected taboo concisely in 3 lines or less, focusing on:
    a) Its significance in the local culture
    b) How travelers can respectfully avoid or navigate it
@@ -20,10 +20,12 @@ Important guidelines:
 - Present information objectively and respectfully.
 - If uncertain about a taboo's validity, express this uncertainty.
 - Do not include potentially offensive or extremely sensitive content.
+- Be informal like you are a real tourist guide sharing local insights.
+
 
 Your response should be in the ${inputData?.currentLanguage || "English"} language.
+if failed to do that detect the language of the user and provide the response in the same language.
 
-If you encounter any issues or edge cases, please respond with "Error: [brief description of the issue]".
 `;
   return createPromptObject(prompt);
 };
@@ -44,10 +46,11 @@ Guidelines:
 - Avoid repeating tips from previous interactions.
 - Ensure tips are culturally sensitive and respectful.
 - If a tip involves local customs, provide context for better understanding.
+- Be informal like you are a real tourist guide sharing local insights.
+
 
 Your response should be in the ${inputData?.currentLanguage || "English"} language.
-
-If you encounter any issues, please respond with "Error: [brief description of the issue]".
+if failed to do that detect the language of the user and provide the response in the same language.
 `;
   return createPromptObject(prompt);
 };
@@ -68,10 +71,11 @@ Guidelines:
 - Focus on reputable and transparent organizations.
 - Avoid showing bias towards any particular organization.
 - If information is limited or uncertain, clearly state this.
+- Be informal like you are a real tourist guide sharing local insights.
+
 
 Your response should be in the ${inputData?.currentLanguage || "English"} language.
-
-If you encounter any issues, please respond with "Error: [brief description of the issue]".
+if failed to do that detect the language of the user and provide the response in the same language.
 `;
   const schema = generateSchema("recommendation donation entity name", {
     name: ["string", "donation entity name"],
@@ -94,10 +98,13 @@ Guidelines:
 - Ensure the suggested phrase is respectful and appropriate for the context.
 - If the situation is ambiguous or could be interpreted in multiple ways, provide options for different interpretations.
 - If the situation could be sensitive or potentially offensive, provide a warning and suggest a more neutral alternative.
+- Be informal like you are a real tourist guide sharing local insights.
 
-Your response should be in the ${inputData?.currentLanguage || "English"} language, with the suggested phrase in the local language of ${inputData?.country || "the specified country"}.
 
-If you encounter any issues or if the situation is inappropriate, please respond with "Error: [brief description of the issue]".
+Your response should be in the ${inputData?.currentLanguage} language, with the suggested phrase in the local language of ${inputData?.country || "the specified country"}.
+
+Response in any other language is not accepted at all, note that the language provided can also be a language code. For example, 'en' for English.
+if failed to do that detect the language of the user and provide the response in the same language.
 `;
   return createPromptObject(prompt);
 };
@@ -127,9 +134,8 @@ Guidelines:
 - If user preferences are contradictory or unclear, explain your reasoning for the recommendation.
 - be informal, insightful and enjoyable
 
-Your response should be in the ${inputData?.currentLanguage || "English"} language.
-
-If you encounter any issues, please respond with "Error: [brief description of the issue]".
+Your response should be in the ${inputData?.currentLanguage} language.
+if failed to do that detect the language of the user and provide the response in the same language.
 `;
 
   const schema = generateSchema("recommendation for country or plan", {
@@ -143,6 +149,39 @@ If you encounter any issues, please respond with "Error: [brief description of t
   return createPromptObject(prompt, schema);
 };
 
+export const getCountryDataPrompt = (inputData) => {
+  const prompt = `
+As an AI travel recommendation system, your task is to add data for country country for the user's current travel destination based on their input for the country. Follow these steps:
+
+1. Analyze the user's current traveling country:
+   User's traveling country: ${JSON.stringify(inputData?.country)}
+
+2. Provide the following information about the recommended country:
+   a) Country name
+   b) Flag (as a text emoji)
+   c) Concise overview (50-75 words)
+   d) Name of the most iconic landmark
+   e) The user's base language (based on their base country)
+
+Guidelines:
+- Provide a balanced overview, highlighting both positives and potential challenges.
+- be informal, insightful and enjoyable
+
+Your response should be in the ${inputData?.currentLanguage} language.
+if failed to do that detect the language of the user and provide the response in the same language.
+`;
+
+  const schema = generateSchema("details for country", {
+    country: ["string", "traveling country"],
+    flag: ["string", "flag"],
+    description: ["string", "traveling country description", false, "string"],
+    baseLanguage: ["string", "base country language code"],
+    mostFamousLandmark: ["string", "most famous landmark for the traveling country"],
+  });
+
+  return createPromptObject(prompt, schema);
+};
+
 export const getEnvironmentalImpactPrompt = (inputData) => {
   const prompt = `
 As an AI environmental impact assessor, your task is to calculate the user's environmental impact score based on their travel plans and provide recommendations to minimize negative impacts. Follow these steps:
@@ -151,24 +190,26 @@ As an AI environmental impact assessor, your task is to calculate the user's env
    User's answers: ${JSON.stringify(inputData?.answers)}
    Corresponding questions: ${JSON.stringify(inputData?.questions)}
 
-2. Calculate an environmental impact score and state the scroe is out of 10 (0-10, where 0 is lowest impact and 10 is highest) based on factors such as:
+2. Calculate an environmental impact score and state the score is out of 10 (0-10, where 0 is lowest impact and 10 is highest) based on factors such as:
    - Mode of transportation
    - Distance traveled
    - Duration of stay
    - Type of accommodations
    - Planned activities
 
+   and state the reason why you gave such score. it's very important. Don't just give recommendations without explaining the score.
 3. Provide 3-5 specific, actionable recommendations to reduce the user's environmental impact, tailored to their travel plans.
 
 Guidelines:
-- Explain the reasoning behind the impact score calculation.
+- Explain the scoring system first, max and min meaning, etc..
+- Explain the reasoning behind the impact score calculation. it's very important
 - Ensure recommendations are practical and relevant to the user's specific travel plans.
 - Present information in a way that encourages positive action without inducing excessive guilt or anxiety.
 - If certain information is missing, state assumptions made in your calculations.
+- Be informal like you are a real tourist guide sharing local insights.
+
 
 Your response should be in the ${inputData?.currentLanguage || "English"} language.
-
-If you encounter any issues, please respond with "Error: [brief description of the issue]".
 `;
 
   const schema = generateSchema("calculate environmental impact", {
