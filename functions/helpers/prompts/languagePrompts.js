@@ -192,6 +192,7 @@ Translation instructions:
         whereAreYouNow: ["string", "Translate: 'Where are you now?'"],
         yes:  ["string", "Translate: 'Yes'"],
         no:  ["string", "Translate: 'No'"],
+        enterYourAnswerHere: ["string", "Translate: 'Enter your answer here...'"],
       },
     ],
   });
@@ -236,6 +237,7 @@ export const getTranslatePriorityWordsPrompt = (inputData) => {
         whereAreYouNow: ["string", "Translate: 'Where are you now?'"],
         yes:  ["string", "Translate: 'Yes'"],
         no:  ["string", "Translate: 'No'"],
+        enterYourAnswerHere: ["string", "Translate: 'Enter your answer here...'"],
       },
     ],
   });

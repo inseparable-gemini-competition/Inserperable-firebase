@@ -151,12 +151,12 @@ if failed to do that detect the language of the user and provide the response in
 
 export const getCountryDataPrompt = (inputData) => {
   const prompt = `
-As an AI travel recommendation system, your task is to add data for country country for the user's current travel destination based on their input for the country. Follow these steps:
+As an AI travel recommendation system, your task is to get data for user's current travel destination which he will give its name to you. Follow these steps:
 
 1. Analyze the user's current traveling country:
    User's traveling country: ${JSON.stringify(inputData?.country)}
 
-2. Provide the following information about the recommended country:
+2. Provide the following information about the input country:
    a) Country name
    b) Flag (as a text emoji)
    c) Concise overview (50-75 words)
@@ -172,11 +172,11 @@ if failed to do that detect the language of the user and provide the response in
 `;
 
   const schema = generateSchema("details for country", {
-    country: ["string", "traveling country"],
+    country: ["string", "user's input country"],
     flag: ["string", "flag"],
-    description: ["string", "traveling country description", false, "string"],
+    description: ["string", "user's input country description", false, "string"],
     baseLanguage: ["string", "base country language code"],
-    mostFamousLandmark: ["string", "most famous landmark for the traveling country"],
+    mostFamousLandmark: ["string", "most famous landmark for the user's input country"],
   });
 
   return createPromptObject(prompt, schema);
@@ -190,7 +190,7 @@ As an AI environmental impact assessor, your task is to calculate the user's env
    User's answers: ${JSON.stringify(inputData?.answers)}
    Corresponding questions: ${JSON.stringify(inputData?.questions)}
 
-2. Calculate an environmental impact score and state the score is out of 10 (0-10, where 0 is lowest impact and 10 is highest) based on factors such as:
+2. Calculate an environmental impact score and state the score is out of 10 (0-10, where 0 is lowest score (least friendly) and 10 is highest score(most friendly to environment)) based on factors such as:
    - Mode of transportation
    - Distance traveled
    - Duration of stay
@@ -198,7 +198,7 @@ As an AI environmental impact assessor, your task is to calculate the user's env
    - Planned activities
 
    and state the reason why you gave such score. it's very important. Don't just give recommendations without explaining the score.
-3. Provide 3-5 specific, actionable recommendations to reduce the user's environmental impact, tailored to their travel plans.
+3. Provide 3-5 specific, actionable recommendations to reduce the user's harmful environmental impact, tailored to their travel plans.
 
 Guidelines:
 - Explain the scoring system first, max and min meaning, etc..
