@@ -116,7 +116,7 @@ Translation instructions:
         ],
 
         // Categories and Features
-        survey: ["string", "Translate: 'Survey'"],
+        travelAgain: ["string", "Translate: 'Travel Again?'"],
         donationInfo: ["string", "Translate: 'Donation Info'"],
         country: ["string", "Translate: 'Country'"],
         adventure: ["string", "Translate: 'Adventure'"],
@@ -193,6 +193,8 @@ Translation instructions:
         yes:  ["string", "Translate: 'Yes'"],
         no:  ["string", "Translate: 'No'"],
         enterYourAnswerHere: ["string", "Translate: 'Enter your answer here...'"],
+        userScoreUpdated: ["string", "Translate: 'User scores updated successfully'"],
+        failedToUpdateUserScore: ["string", "Translate: 'Failed to update user score'"],
       },
     ],
   });

@@ -15,6 +15,8 @@ Guidelines:
 6. Ensure to ask about budget at some point in the survey.
 7. Provide only the JSON response, nothing more or less.
 8. use wide variation of questions.
+9. Ensure no questions are repeated.
+
 
 JSON Structure:
 {
@@ -31,14 +33,8 @@ JSON Structure:
 
 For multiple-choice questions, provide 3-5 options. For open-ended questions, set "options" to an empty array and "isOpenEnded" to true.
 
-Example question types:
-1. Travel preferences: "What's your ideal vacation pace: relaxed, balanced, or action-packed?"
-2. Cultural interests: "Which aspect of foreign cultures interests you most: history, art, cuisine, or local customs?"
-3. Activity preferences: "Do you prefer urban exploration, nature adventures, or a mix of both?"
-4. Climate preferences: "What's your ideal travel climate: tropical, Mediterranean, alpine, or variable?"
-5. Budget considerations: "What's your daily budget range for this trip: $50-100, $100-200, $200-300, or $300+?"
 
-Tailor each new question based on previous responses to build a comprehensive traveler profile. Aim for a mix of specific and broad questions to gather diverse information for making an informed country recommendation.
+Try to tailor each new question based on previous responses to build a comprehensive traveler profile. Aim for a mix of specific and broad questions to gather diverse information for making an informed country recommendation.
 
 Your response should be in the ${inputData?.currentLanguage || "English"} language.
 

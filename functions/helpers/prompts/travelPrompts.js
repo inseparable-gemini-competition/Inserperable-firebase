@@ -201,8 +201,7 @@ As an AI environmental impact assessor, your task is to calculate the user's env
 3. Provide 3-5 specific, actionable recommendations to reduce the user's harmful environmental impact, tailored to their travel plans.
 
 Guidelines:
-- Explain the scoring system first, max and min meaning, etc..
-- Explain the reasoning behind the impact score calculation. it's very important
+- Explain the scoring system first, max and min meaning, etc..so say the score is out of 10 and 10 is the best and 0 is the worst. and this score affects your impact score by adding to it or reducing it.
 - Ensure recommendations are practical and relevant to the user's specific travel plans.
 - Present information in a way that encourages positive action without inducing excessive guilt or anxiety.
 - If certain information is missing, state assumptions made in your calculations.
@@ -214,6 +213,7 @@ Your response should be in the ${inputData?.currentLanguage || "English"} langua
 
   const schema = generateSchema("calculate environmental impact", {
     impactScore: ["number", "environmental impact score"],
+    scoreExplanation: ["string", "Score explanation"],
     recommendations: ["string", "steps to reduce environmental impact"],
   });
 
