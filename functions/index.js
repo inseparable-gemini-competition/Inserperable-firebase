@@ -13,6 +13,9 @@ import {
   getUserScore,
   updateUserScore,
   extractCulturalVideoAnalysis,
+  analyzeAndSavePhoto,
+  getPhotos,
+  searchPhotos,
 } from "./httpsFunctions/index.js";
 
 // Export functions
@@ -28,4 +31,7 @@ export {
   getUserScore,
   updateUserScore,
   extractCulturalVideoAnalysis,
+  analyzeAndSavePhoto,
+  getPhotos,
+  searchPhotos,
 };

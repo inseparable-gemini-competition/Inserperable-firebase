@@ -5,3 +5,6 @@ export * from './uberTripFunctions.js';
 export * from './getUserScore.js';
 export * from './calculateWeightedAverage.js';
 export * from './extractCulturalVideoAnalysis.js';
+export * from './analyzeAndSavePhoto.js';
+export * from './getPhotos.js';
+export * from './searchPhotos.js';
