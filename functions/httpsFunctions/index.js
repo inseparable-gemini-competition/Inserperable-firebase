@@ -4,3 +4,4 @@ export * from './generateText.js';
 export * from './uberTripFunctions.js';    
 export * from './getUserScore.js';
 export * from './calculateWeightedAverage.js';
+export * from './extractCulturalVideoAnalysis.js';

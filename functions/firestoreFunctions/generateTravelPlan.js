@@ -200,6 +200,9 @@ export const generateTravelPlan = functions.firestore
         Guideline:
         - all the text has to be in ${userData?.baseLanguage} language
         - all the places have to be real place that will have latitude and longitude
+        - Don't say general activities like "go to the beach", instead say "go to the beach in X city"
+        - Each mood should contain 10 places.
+
       `;
 
       functions.logger.info(`Sending query to Generative AI: ${query}`);

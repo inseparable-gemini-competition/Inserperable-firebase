@@ -11,7 +11,8 @@ import {
   generateText,
   scheduleTrip,
   getUserScore,
-  updateUserScore
+  updateUserScore,
+  extractCulturalVideoAnalysis,
 } from "./httpsFunctions/index.js";
 
 // Export functions
@@ -25,5 +26,6 @@ export {
   generateText,
   scheduleTrip,
   getUserScore,
-  updateUserScore
+  updateUserScore,
+  extractCulturalVideoAnalysis,
 };
