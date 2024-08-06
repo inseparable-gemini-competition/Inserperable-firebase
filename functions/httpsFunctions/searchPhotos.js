@@ -53,10 +53,11 @@ export const searchPhotos = functions.https.onCall(async (data, context) => {
       },
     });
 
-    const prompt = `Analyze this travel photo and determine if it matches the search query: "${query}". Return "true" if it matches, "false" if it doesn't.`;
 
     const photoPromises = photos.map(async (photo) => {
       let imageBuffer;
+      const prompt = `Analyze this travel photo, that has this description ${photo.description} and determine if it matches the search query: "${query}". Return "true" if it matches, "false" if it doesn't.`;
+
 
       // Fetch image from URL
       if (photo.url) {

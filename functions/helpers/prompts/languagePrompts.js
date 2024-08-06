@@ -116,7 +116,7 @@ Translation instructions:
         ],
 
         // Categories and Features
-        travelAgain: ["string", "Translate: 'Travel Again?'"],
+        travelAgain: ["string", "Translate: 'Another Country?'"],
         donationInfo: ["string", "Translate: 'Donation Info'"],
         country: ["string", "Translate: 'Country'"],
         adventure: ["string", "Translate: 'Adventure'"],
@@ -195,6 +195,18 @@ Translation instructions:
         enterYourAnswerHere: ["string", "Translate: 'Enter your answer here...'"],
         userScoreUpdated: ["string", "Translate: 'User scores updated successfully'"],
         failedToUpdateUserScore: ["string", "Translate: 'Failed to update user score'"],
+        enterYoutubeUrl: ["string", "Translate: 'Enter Youtube URL'"],
+        analyzingVideo: ["string", "Translate: 'Analyzing Video'"],
+        getCulturalContext: ["string", "Translate: 'Get Cultural Context'"],
+        getInsights: ["string", "Translate: 'Get Insights'"],
+        culturalVideoAnalyzer: ["string", "Translate: 'Cultural Video Analyzer'"],
+        noPhotosFound: ["string", "Translate: 'No photos found'"],
+        anErrorOccurred: ["string", "Translate: 'An error occurred'"],
+        searchPhotos: ["string", "Translate: 'Search Photos'"],
+        uploadPhoto: ["string", "Translate: 'Upload Photo'"],
+        travelMemories: ["string", "Translate: 'Travel Memories'"],
+        captions: ["string", "Translate: 'Captions'"],
+        
       },
     ],
   });

@@ -1,9 +1,7 @@
 import functions from "firebase-functions";
 import { db } from "../helpers/firebaseAdmin.js";
 import axios from "axios";
-import {
-  GoogleGenerativeAI,
-} from "@google/generative-ai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const GOOGLE_API_KEY = functions.config().google.apikey;
 const GEN_AI_KEY = functions.config().genai.apikey;
@@ -33,7 +31,10 @@ const fetchPhotoUrl = async (description) => {
     functions.logger.warn(`No photo found for ${description}`);
     return null;
   } catch (error) {
-    functions.logger.error(`Error fetching photo for ${description}: ${error.message}`, { error });
+    functions.logger.error(
+      `Error fetching photo for ${description}: ${error.message}`,
+      { error }
+    );
     return null;
   }
 };
@@ -64,12 +65,18 @@ const retryOperation = async (operation, retries = 0) => {
   }
 };
 
-export const generateTravelPlan = functions.firestore
-  .document("users/{userId}")
+export const generateTravelPlan = functions
+  .runWith({
+    timeoutSeconds: 540,
+    memory: "2GB",
+  })
+  .firestore.document("users/{userId}")
   .onCreate(async (snap, context) => {
     const userData = snap.data();
     const country = userData.country;
-    functions.logger.info(`Generating travel plan for user: ${context.params.userId}, country: ${country}`);
+    functions.logger.info(
+      `Generating travel plan for user: ${context.params.userId}, country: ${country}`
+    );
     const genAI = new GoogleGenerativeAI(GEN_AI_KEY);
 
     const model = genAI.getGenerativeModel({
@@ -245,9 +252,14 @@ export const generateTravelPlan = functions.firestore
         travelPlan,
       });
 
-      functions.logger.info("Travel plan saved successfully!", { userId: context.params.userId });
+      functions.logger.info("Travel plan saved successfully!", {
+        userId: context.params.userId,
+      });
     } catch (error) {
-      functions.logger.error("Error generating travel plan after all retries:", { error });
+      functions.logger.error(
+        "Error generating travel plan after all retries:",
+        { error }
+      );
       await db.collection("users").doc(context.params.userId).update({
         travelPlanError: error.message,
       });
@@ -267,7 +279,10 @@ const getLatLong = async (placeName) => {
     );
 
     if (response.data.status !== "OK") {
-      functions.logger.error(`Geocoding API error for ${placeName}: ${response.data.status}`, { response: response.data });
+      functions.logger.error(
+        `Geocoding API error for ${placeName}: ${response.data.status}`,
+        { response: response.data }
+      );
       return { latitude: null, longitude: null };
     }
 
@@ -282,16 +297,23 @@ const getLatLong = async (placeName) => {
       typeof location.lat !== "number" ||
       typeof location.lng !== "number"
     ) {
-      functions.logger.error(`Invalid location data for ${placeName}`, { location });
+      functions.logger.error(`Invalid location data for ${placeName}`, {
+        location,
+      });
       return { latitude: null, longitude: null };
     }
 
     functions.logger.info(`Lat/Long fetched for ${placeName}`, { location });
     return { latitude: location.lat, longitude: location.lng };
   } catch (error) {
-    functions.logger.error(`Error fetching lat/long for ${placeName}: ${error.message}`, { error });
+    functions.logger.error(
+      `Error fetching lat/long for ${placeName}: ${error.message}`,
+      { error }
+    );
     if (error.response) {
-      functions.logger.error("Error response from Geocoding API", { response: error.response.data });
+      functions.logger.error("Error response from Geocoding API", {
+        response: error.response.data,
+      });
     }
     return { latitude: null, longitude: null };
   }
