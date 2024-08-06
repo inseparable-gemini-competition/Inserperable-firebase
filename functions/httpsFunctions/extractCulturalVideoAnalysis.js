@@ -5,16 +5,14 @@ import {
   HarmBlockThreshold,
 } from "@google/generative-ai";
 import { GoogleAIFileManager, FileState } from "@google/generative-ai/server";
-import youtubedl from "youtube-dl-exec";
-import { promisify } from "util";
-import stream from "stream";
+import ytdl from "@distube/ytdl-core";
+import { pipeline } from "stream/promises";
 import { storage } from "../helpers/firebaseAdmin.js";
 import { writeFileSync, unlinkSync } from "fs";
 import { join } from "path";
 import os from "os";
 
 const bucket = storage().bucket();
-const pipeline = promisify(stream.pipeline);
 
 const downloadToStorage = async (url, filename) => {
   const file = bucket.file(filename);
@@ -26,14 +24,10 @@ const downloadToStorage = async (url, filename) => {
 
   try {
     console.log(`Starting download of ${url} to ${filename}`);
-    const videoStream = youtubedl.exec(
-      url,
-      {
-        format: "mp4",
-        output: "-",
-      },
-      { stdio: ["ignore", "pipe", "ignore"] }
-    ).stdout;
+    const videoStream = ytdl(url, {
+      quality: 'lowestaudio',
+      filter: 'audioandvideo',
+    });
 
     await pipeline(videoStream, writeStream);
     console.log(`Download completed: ${filename}`);
@@ -72,6 +66,7 @@ export const extractCulturalVideoAnalysis = functions
     try {
       const youtubeUrl = data.url;
       const targetLanguage = data.language || "unknown";
+      const country = data.country || "unknown";
 
       console.log(
         `Processing YouTube URL: ${youtubeUrl}, Target Language: ${targetLanguage}`
@@ -160,7 +155,7 @@ export const extractCulturalVideoAnalysis = functions
         },
       });
 
-      const prompt = `Analyze this video and provide key cultural insights for a traveler. 
+      const prompt = `Analyze this video and provide key cultural insights for a traveler to ${country}
       talk in a deep way in ${targetLanguage} language summarize the video, then get cultural insights from it, like what are people wearing and why, what are they doing and why, what are they saying and why.
       how this connects to their history and norms, what are things that is understood only by country people, and explain it`;
 
