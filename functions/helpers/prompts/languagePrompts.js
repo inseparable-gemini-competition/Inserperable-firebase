@@ -204,7 +204,7 @@ Translation instructions:
         nothing: ["string", "Translate: 'Nothing'"],
         pleaseStartSpeakingAndLongPresToStop: [
           "string",
-          "Translate: 'Please start speaking and long press to stop'",
+          "Translate: 'Please start speaking when the mic is red and make long press to stop'",
         ],
         processing: ["string", "Translate: 'Processing'"],
         identifiedCategory: ["string", "Translate: 'Identified Category'"],
