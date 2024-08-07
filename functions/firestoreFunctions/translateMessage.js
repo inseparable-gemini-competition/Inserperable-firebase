@@ -46,10 +46,8 @@ export const translateMessage = functions.firestore
         .doc(context.params.messageId)
         .update({ translatedText });
     } catch (error) {
-      const friendlyMessage = getFriendlyErrorMessage(
-        "Error generating content:",
-        error
-      );
+      const friendlyMessage = getFriendlyErrorMessage(error);
+
       throw new functions.https.HttpsError("internal", friendlyMessage);
     }
   });

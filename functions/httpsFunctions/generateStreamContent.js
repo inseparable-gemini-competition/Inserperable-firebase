@@ -51,7 +51,7 @@ export const generateStreamContent = functions.https.onCall(async (data) => {
 
     return { result };
   } catch (error) {
-    const friendlyMessage = getFriendlyErrorMessage("Error generating content:", error);
+    const friendlyMessage = getFriendlyErrorMessage(error);
     throw new functions.https.HttpsError("internal", friendlyMessage);
   }
 });

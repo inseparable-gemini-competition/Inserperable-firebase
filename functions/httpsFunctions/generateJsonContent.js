@@ -36,10 +36,8 @@ export const generateJsonContent = functions.https.onCall(async (data) => {
 
     return { result: jsonResult };
   } catch (error) {
-    const friendlyMessage = getFriendlyErrorMessage(
-      "Error generating content:",
-      error
-    );
+    const friendlyMessage = getFriendlyErrorMessage(error);
+
     throw new functions.https.HttpsError("internal", friendlyMessage);
   }
 });

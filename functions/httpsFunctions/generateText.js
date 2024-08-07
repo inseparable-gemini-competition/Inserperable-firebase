@@ -63,7 +63,7 @@ export const generateText = functions.https.onCall(async (data) => {
     return { result: result?.response?.text() };
   } catch (error) {
     console.error("Error generating content:", error);
-    const friendlyMessage = getFriendlyErrorMessage("Error generating content:", error);
+    const friendlyMessage = getFriendlyErrorMessage(error);
     throw new functions.https.HttpsError("internal", friendlyMessage);
   }
 });

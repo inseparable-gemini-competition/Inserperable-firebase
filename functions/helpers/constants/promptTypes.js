@@ -14,7 +14,6 @@ export const PROMPT_TYPES = {
   NEXT_QUESTION_ENVIRONMENT: "nextQuestionEnvironment",
   TRANSLATE_APP: "translateApp",
   TRANSLATE_PRIORITY: "translatePriority",
-  AUDIO_TRANSCRIPTION: "audioTranscription",
   AUDIO_COMMAND: "audioCommand",
   COUNTRY_DATA: "countryData",
 };
