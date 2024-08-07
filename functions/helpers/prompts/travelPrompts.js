@@ -127,6 +127,7 @@ As an AI travel recommendation system, your task is to suggest a suitable countr
    c) Concise overview (50-75 words)
    d) Name of the most iconic landmark
    e) The user's base language (based on their base country)
+   f) The country's currency
 
 Guidelines:
 - Ensure the recommendation is well-matched to the user's preferences.
@@ -138,12 +139,13 @@ Your response should be in the ${inputData?.currentLanguage} language.
 if failed to do that detect the language of the user and provide the response in the same language.
 `;
 
-  const schema = generateSchema("recommendation for country or plan", {
+  const schema = generateSchema("recommendation for country", {
     country: ["string", "recommended country"],
     flag: ["string", "flag"],
     description: ["string", "recommended country description", false, "string"],
     baseLanguage: ["string", "base country language code"],
     mostFamousLandmark: ["string", "most famous landmark for the recommended country"],
+    couuntryCurrency: ["string", "recommended country currency"],
   });
 
   return createPromptObject(prompt, schema);
@@ -190,7 +192,7 @@ As an AI environmental impact assessor, your task is to calculate the user's env
    User's answers: ${JSON.stringify(inputData?.answers)}
    Corresponding questions: ${JSON.stringify(inputData?.questions)}
 
-2. Calculate an environmental impact score and state the score is out of 10 (0-10, where 0 is lowest score (least friendly) and 10 is highest score(most friendly to environment)) based on factors such as:
+2. Calculate good environmental impact score and state the score is out of 10 (0-10, where 0 is lowest score (least friendly) and 10 is highest score(most friendly to environment)) based on factors such as:
    - Mode of transportation
    - Distance traveled
    - Duration of stay
@@ -202,6 +204,7 @@ As an AI environmental impact assessor, your task is to calculate the user's env
 
 Guidelines:
 - Explain the scoring system first, max and min meaning, etc..so say the score is out of 10 and 10 is the best and 0 is the worst. and this score affects your impact score by adding to it or reducing it.
+- Explain clearly that the lower the score the worse the impact and the higher the score the better the impact.
 - Ensure recommendations are practical and relevant to the user's specific travel plans.
 - Present information in a way that encourages positive action without inducing excessive guilt or anxiety.
 - If certain information is missing, state assumptions made in your calculations.

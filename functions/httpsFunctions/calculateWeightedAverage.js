@@ -102,7 +102,6 @@ export const updateUserScore = functions.https.onCall(async (data, context) => {
   if (!context.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated to update scores.');
   }
-
   const { userId, ...newScores } = data;
 
   if (!userId || Object.keys(newScores).length === 0) {

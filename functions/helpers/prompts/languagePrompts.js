@@ -23,7 +23,6 @@ Translated text:
   return createPromptObject(prompt);
 };
 
-
 const KEYWORDS = [
   "identify",
   "price",
@@ -52,8 +51,24 @@ export const getAudioCommandPrompt = () => {
 
 export const getTranslateAppPrompt = (inputData) => {
   const country = inputData?.country;
+  const baseLanguage = inputData?.baseLanguage;
 
-  const prompt = `
+  let prompt = "";
+  if (baseLanguage)
+    prompt = `
+Translate the values for keys in the 'translations' field of the schema to the language ${baseLanguage}.
+Also, set 'baseLanguage' as the language code for ${baseLanguage}, and isRTl which is the language write direction
+
+Please adhere to the following guidelines:
+1. Maintain a consistent tone and style across all translations.
+2. Consider cultural context and local idioms when translating.
+3. For words that may have different forms (singular/plural or gender-specific), provide the most commonly used form.
+4. If a direct translation is not suitable, provide a culturally appropriate alternative and add a comment explaining the change.
+
+Translation instructions:
+`;
+  else
+    prompt = `
 Translate the values for keys in the 'translations' field of the schema to the language of ${country}.
 Also, set 'baseLanguage' as the language code for ${country}, and isRTl which is the language write direction
 
@@ -116,7 +131,8 @@ Translation instructions:
         ],
 
         // Categories and Features
-        travelAgain: ["string", "Translate: 'Another Country?'"],
+        logout: ["string", "Translate: 'Logout?'"],
+        recommendation: ["string", "Translate: 'Recommendation'"],
         donationInfo: ["string", "Translate: 'Donation Info'"],
         country: ["string", "Translate: 'Country'"],
         adventure: ["string", "Translate: 'Adventure'"],
@@ -143,7 +159,10 @@ Translation instructions:
         // Error and Status Messages
         fetchError: ["string", "Translate: Fetch error message"],
         noHandmadeItems: ["string", "Translate: 'No handmade items available'"],
-        noDataAvailable: ["string", "Translate: 'We are cooking up something for you, wait for a while and try again'"],
+        noDataAvailable: [
+          "string",
+          "Translate: 'We are cooking up something for you, wait for a while and try again'",
+        ],
 
         // User Interaction Prompts
         whatToSay: ["string", "Translate: 'What to say?'"],
@@ -174,13 +193,19 @@ Translation instructions:
         viewOnMap: ["string", "Translate: 'View on Map'"],
         openInUber: ["string", "Translate: 'Open in Uber'"],
         weRecommend: ["string", "Translate: 'We Recommend'"],
-        Whattransportationdidyouusetoday: ["string", "Translate: 'What transportation did you use today?'"],
+        Whattransportationdidyouusetoday: [
+          "string",
+          "Translate: 'What transportation did you use today?'",
+        ],
         airplane: ["string", "Translate: 'Airplane'"],
         car: ["string", "Translate: 'Car'"],
         bicycle: ["string", "Translate: 'Bicycle'"],
         walking: ["string", "Translate: 'Walking'"],
         nothing: ["string", "Translate: 'Nothing'"],
-        pleaseStartSpeakingAndLongPresToStop: ["string", "Translate: 'Please start speaking and long press to stop'"],
+        pleaseStartSpeakingAndLongPresToStop: [
+          "string",
+          "Translate: 'Please start speaking and long press to stop'",
+        ],
         processing: ["string", "Translate: 'Processing'"],
         identifiedCategory: ["string", "Translate: 'Identified Category'"],
         unidentifiedCategory: ["string", "Translate: 'Unidentified Category'"],
@@ -188,25 +213,42 @@ Translation instructions:
         notVisiting: ["string", "Translate: 'Not Visiting'"],
         impactScore: ["string", "Translate: 'Impact Score'"],
         whereAreYouBased: ["string", "Translate: 'Where are you based?'"],
-        areYouCurrentlyTraveling: ["string", "Translate: 'Are you currently traveling?'"],
+        areYouCurrentlyTraveling: [
+          "string",
+          "Translate: 'Are you currently traveling?'",
+        ],
         whereAreYouNow: ["string", "Translate: 'Where are you now?'"],
-        yes:  ["string", "Translate: 'Yes'"],
-        no:  ["string", "Translate: 'No'"],
-        enterYourAnswerHere: ["string", "Translate: 'Enter your answer here...'"],
-        userScoreUpdated: ["string", "Translate: 'User scores updated successfully'"],
-        failedToUpdateUserScore: ["string", "Translate: 'Failed to update user score'"],
+        yes: ["string", "Translate: 'Yes'"],
+        no: ["string", "Translate: 'No'"],
+        enterYourAnswerHere: [
+          "string",
+          "Translate: 'Enter your answer here...'",
+        ],
+        userScoreUpdated: [
+          "string",
+          "Translate: 'User Impact score updated successfully'",
+        ],
+        failedToUpdateUserScore: [
+          "string",
+          "Translate: 'Failed to update user score'",
+        ],
         enterYoutubeUrl: ["string", "Translate: 'Enter Youtube URL'"],
         analyzingVideo: ["string", "Translate: 'Analyzing Video'"],
         getCulturalContext: ["string", "Translate: 'Get Cultural Context'"],
         getInsights: ["string", "Translate: 'Get Insights'"],
-        culturalVideoAnalyzer: ["string", "Translate: 'Cultural Video Analyzer'"],
+        culturalVideoAnalyzer: [
+          "string",
+          "Translate: 'Cultural Video Analyzer'",
+        ],
         noPhotosFound: ["string", "Translate: 'No photos found'"],
         anErrorOccurred: ["string", "Translate: 'An error occurred'"],
         searchPhotos: ["string", "Translate: 'Search Photos'"],
         uploadPhoto: ["string", "Translate: 'Upload Photo'"],
         travelMemories: ["string", "Translate: 'Travel Memories'"],
         captions: ["string", "Translate: 'Captions'"],
-        
+        back: ["string", "Translate: 'Back'"],
+        translating: ["string", "Translate: 'Translating'"],
+        chatAbout: ["string", "Translate: 'Chat About'"],
       },
     ],
   });
@@ -247,15 +289,20 @@ export const getTranslatePriorityWordsPrompt = (inputData) => {
         recommending: ["string", "Translate: 'Recommending'"],
         fetchingNextQuestion: ["string", "Translate: 'Fetching Next Question'"],
         whereAreYouBased: ["string", "Translate: 'Where are you based?'"],
-        areYouCurrentlyTraveling: ["string", "Translate: 'Are you currently traveling?'"],
+        areYouCurrentlyTraveling: [
+          "string",
+          "Translate: 'Are you currently traveling?'",
+        ],
         whereAreYouNow: ["string", "Translate: 'Where are you now?'"],
-        yes:  ["string", "Translate: 'Yes'"],
-        no:  ["string", "Translate: 'No'"],
-        enterYourAnswerHere: ["string", "Translate: 'Enter your answer here...'"],
+        yes: ["string", "Translate: 'Yes'"],
+        no: ["string", "Translate: 'No'"],
+        enterYourAnswerHere: [
+          "string",
+          "Translate: 'Enter your answer here...'",
+        ],
       },
     ],
   });
 
   return createPromptObject(prompt, schema);
-
 };

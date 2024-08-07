@@ -13,11 +13,11 @@ export const searchPhotos = functions.https.onCall(async (data, context) => {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated.');
   }
 
-  const { query, lastVisible, pageSize = 20 } = data;
+  const { query, lastVisible, pageSize = 20, userId } = data;
 
   try {
     let firestoreQuery = db.collection('photos')
-      .where('userId', '==', context.auth.uid)
+      .where('userId', '==', userId)
       .orderBy('timestamp', 'desc');
 
     if (lastVisible) {

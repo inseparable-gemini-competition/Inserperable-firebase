@@ -1,5 +1,5 @@
 import functions from "firebase-functions";
-import { db } from "../helpers/firebaseAdmin.js";
+import { db, FieldValue } from "../helpers/firebaseAdmin.js";
 import axios from "axios";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
@@ -71,9 +71,29 @@ export const generateTravelPlan = functions
     memory: "2GB",
   })
   .firestore.document("users/{userId}")
-  .onCreate(async (snap, context) => {
-    const userData = snap.data();
-    const country = userData.country;
+  .onWrite(async (change, context) => {
+    const newValue = change.after.exists ? change.after.data() : null;
+    const previousValue = change.before.exists ? change.before.data() : null;
+
+    if (!newValue) {
+      functions.logger.info("User document deleted, skipping travel plan generation");
+      return null;
+    }
+
+    // Check if this update is coming from this function itself
+    if (newValue.travelPlanLastUpdated && 
+        (!previousValue || newValue.travelPlanLastUpdated !== previousValue.travelPlanLastUpdated)) {
+      functions.logger.info("Travel plan just updated, skipping to avoid loop");
+      return null;
+    }
+
+    // Check if country has changed or if it's a new user
+    if (previousValue && newValue.country === previousValue.country && previousValue.travelPlan) {
+      functions.logger.info("Country not changed and travel plan exists, skipping generation");
+      return null;
+    }
+
+    const country = newValue.country;
     functions.logger.info(
       `Generating travel plan for user: ${context.params.userId}, country: ${country}`
     );
@@ -205,7 +225,7 @@ export const generateTravelPlan = functions
         }
 
         Guideline:
-        - all the text has to be in ${userData?.baseLanguage} language
+        - all the text has to be in ${newValue?.baseLanguage} language
         - all the places have to be real place that will have latitude and longitude
         - Don't say general activities like "go to the beach", instead say "go to the beach in X city"
         - Each mood should contain 10 places.
@@ -250,6 +270,7 @@ export const generateTravelPlan = functions
 
       await db.collection("users").doc(context.params.userId).update({
         travelPlan,
+        travelPlanLastUpdated: FieldValue.serverTimestamp()
       });
 
       functions.logger.info("Travel plan saved successfully!", {
@@ -262,6 +283,7 @@ export const generateTravelPlan = functions
       );
       await db.collection("users").doc(context.params.userId).update({
         travelPlanError: error.message,
+        travelPlanLastUpdated: FieldValue.serverTimestamp()
       });
     }
   });

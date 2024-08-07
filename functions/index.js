@@ -16,6 +16,7 @@ import {
   analyzeAndSavePhoto,
   getPhotos,
   searchPhotos,
+  getHandmadeItems,
 } from "./httpsFunctions/index.js";
 
 // Export functions
@@ -34,4 +35,5 @@ export {
   analyzeAndSavePhoto,
   getPhotos,
   searchPhotos,
+  getHandmadeItems,
 };

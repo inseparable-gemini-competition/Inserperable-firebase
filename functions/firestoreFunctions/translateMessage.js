@@ -28,6 +28,8 @@ export const translateMessage = functions.firestore
         model: "gemini-1.5-flash",
       });
 
+      
+
       // Prepare translation request using the receiver's base language
       const result = await model.generateContent([
         `please translate this into ${otherBaseLanguage} and only respond with the translated text, here's the text: ${message.text}`,

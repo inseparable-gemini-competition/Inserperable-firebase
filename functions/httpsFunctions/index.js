@@ -8,3 +8,4 @@ export * from './extractCulturalVideoAnalysis.js';
 export * from './analyzeAndSavePhoto.js';
 export * from './getPhotos.js';
 export * from './searchPhotos.js';
+export * from './getHandmadeItems.js';
