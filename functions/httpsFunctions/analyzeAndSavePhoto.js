@@ -24,6 +24,9 @@ export const analyzeAndSavePhoto = functions.storage
       const [buffer] = await file.download();
       const base64Image = buffer.toString("base64");
 
+      // Determine the MIME type from the object's contentType
+      const mimeType = object.contentType || "image/png"; // Default to image/png if not available
+
       // Initialize Google Generative AI with the new model
       const genAI = new GoogleGenerativeAI(functions.config().genai.apikey);
       const schema = generateSchema(
@@ -44,7 +47,7 @@ export const analyzeAndSavePhoto = functions.storage
       const image = {
         inlineData: {
           data: base64Image,
-          mimeType: "image/png",
+          mimeType: mimeType, // Use the determined MIME type
         },
       };
 
@@ -78,11 +81,12 @@ export const analyzeAndSavePhoto = functions.storage
       }
 
       const photoData = {
-        url, // Store the download URL instead of base64 image
+        url,
         description: result?.description,
         captions: result?.captions,
         timestamp: FieldValue.serverTimestamp(),
         userId: object.metadata.userId,
+        mimeType: mimeType, // Store the MIME type in Firestore
       };
 
       try {

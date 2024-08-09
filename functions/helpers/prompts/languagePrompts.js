@@ -212,12 +212,12 @@ Translation instructions:
         visiting: ["string", "Translate: 'Visiting'"],
         notVisiting: ["string", "Translate: 'Not Visiting'"],
         impactScore: ["string", "Translate: 'Impact Score'"],
-        whereAreYouBased: ["string", "Translate: 'Where are you based?'"],
+        whatIsYourOriginalCountry: ["string", "Translate: 'What is your original country?'"],
         areYouCurrentlyTraveling: [
           "string",
           "Translate: 'Are you currently traveling?'",
         ],
-        whereAreYouNow: ["string", "Translate: 'Where are you now?'"],
+        whereAreYouTravelling: ["string", "Translate: 'Where are you travelling?'"],
         yes: ["string", "Translate: 'Yes'"],
         no: ["string", "Translate: 'No'"],
         enterYourAnswerHere: [
@@ -249,6 +249,10 @@ Translation instructions:
         back: ["string", "Translate: 'Back'"],
         translating: ["string", "Translate: 'Translating'"],
         chatAbout: ["string", "Translate: 'Chat About'"],
+        selectVideo: ["string", "Translate: 'Select Video'"],
+        uploadAndAnalyze: ["string", "Translate: 'Upload and Analyze'"],
+        analyzeAnotherVideo: ["string", "Translate: 'Analyze Another Video'"],
+        culturalInsights: ["string", "Translate: 'Cultural Insights'"],
       },
     ],
   });

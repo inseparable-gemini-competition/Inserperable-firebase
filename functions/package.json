@@ -15,7 +15,6 @@
   "main": "index.js",
   "type": "module",
   "dependencies": {
-    "@distube/ytdl-core": "^4.14.3",
     "@google/generative-ai": "^0.15.0",
     "axios": "^1.7.2",
     "firebase-admin": "^12.1.0",

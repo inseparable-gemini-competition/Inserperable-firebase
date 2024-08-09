@@ -42,15 +42,19 @@ export const getHandmadeItems = functions.https.onCall(async (data) => {
           ...item,
           name: {
             original: item.name,
-            translated: item.translations?.[language]?.name,
+            translated: item.translations?.[language]?.name || item.name,
           },
           price: {
             original: item.price,
-            translated: item.translations?.[language]?.price,
+            translated: item.translations?.[language]?.price || item.price,
+          },
+          description: {
+            original: item.description,
+            translated: item.translations?.[language]?.description || item.description,
           },
           carbonFootprint: {
             original: item.carbonFootprint,
-            translated: item.translations?.[language]?.carbonFootprint,
+            translated: item.translations?.[language]?.carbonFootprint || item.carbonFootprint,
           },
         });
       } else {
@@ -86,22 +90,27 @@ export const getHandmadeItems = functions.https.onCall(async (data) => {
 
 async function translateItemsBatch(items, targetLanguage) {
   console.log(`Starting batch translation for ${items.length} items to ${targetLanguage}`);
-  const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
   for (const item of items) {
-    const translationPrompts = ["name", "price", "carbonFootprint"].map(
-      (field) => `Translate to ${targetLanguage}: ${item[field]}`
+    const fieldsToTranslate = ["name", "price", "description", "carbonFootprint"];
+    const translationPrompts = fieldsToTranslate.map(
+      (field) => `Translate this ${field}: "${item[field]}" to ${targetLanguage}. Respond ONLY with the direct translation, nothing else.`
     );
 
     try {
-      const result = await model.generateContent(translationPrompts.join("\n"));
-      const translations = result.response.text().split("\n");
+      const result = await model.generateContent(translationPrompts.join("\n\n"));
+      const translations = result.response.text().split("\n").filter(t => t.trim() !== "");
 
-      const translatedFields = {
-        name: translations[0],
-        price: translations[1],
-        carbonFootprint: translations[2],
-      };
+      const translatedFields = {};
+      fieldsToTranslate.forEach((field, index) => {
+        if (translations[index]) {
+          translatedFields[field] = translations[index].trim();
+        } else {
+          console.warn(`Missing translation for ${field} of item ${item.id}`);
+          translatedFields[field] = item[field]; // Fallback to original if translation is missing
+        }
+      });
 
       await db
         .collection("products")
@@ -109,7 +118,7 @@ async function translateItemsBatch(items, targetLanguage) {
         .update({
           [`translations.${targetLanguage}`]: translatedFields,
         });
-      console.log(`Successfully translated and updated item ${item.id} to ${targetLanguage}`);
+      console.log(`Successfully translated and updated item ${item.id} to ${targetLanguage}`, translatedFields);
     } catch (error) {
       console.error(`Error translating item ${item.id} to ${targetLanguage}:`, error);
     }

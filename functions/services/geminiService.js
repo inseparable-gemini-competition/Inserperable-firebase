@@ -1,9 +1,6 @@
-// functions/services/geminiService.js
-
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenerativeAI, HarmBlockThreshold, HarmCategory } from '@google/generative-ai';
 import * as functions from 'firebase-functions';
 import { generateSchema } from '../helpers/generateSchema.js';
-
 
 const GEN_AI_KEY = functions.config().genai.apikey;
 const geminiAI = new GoogleGenerativeAI(GEN_AI_KEY);
@@ -56,24 +53,40 @@ export const constructSearchPhrase = async (userMoodAndDesires, country) => {
   }
 };
 
-const recommendBestPlaceSchema = generateSchema(
-  "Output for recommended best place",
-  {
-    name: ["string", "Name of the recommended place"],
-    description: ["string", "Description of why this place is recommended"]
-  }
-);
+const recommendBestPlacesSchema = {
+  type: "object",
+  properties: {
+    recommendations: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          name: {
+            type: "string",
+            description: "Name of the recommended place"
+          },
+          description: {
+            type: "string",
+            description: "Description of why this place is recommended"
+          }
+        },
+        required: ["name", "description"]
+      }
+    }
+  },
+  required: ["recommendations"]
+};
 
-export const recommendBestPlace = async (searchResults, originalUserInput, country, currentLanguage) => {
+export const recommendBestPlaces = async (searchResults, originalUserInput, country, currentLanguage) => {
   const model = geminiAI.getGenerativeModel({ 
     model: "gemini-1.5-flash",
     generationConfig: {
       temperature: 0.7,
       topK: 40,
       topP: 0.95,
-      maxOutputTokens: 1024,
+      maxOutputTokens: 2048,
       responseMimeType: "application/json",
-      responseSchema: recommendBestPlaceSchema,
+      responseSchema: recommendBestPlacesSchema,
     },
   });
   const prompt = `
@@ -83,22 +96,51 @@ export const recommendBestPlace = async (searchResults, originalUserInput, count
     And considering the original user input:
     "${originalUserInput}" and the country is ${country}.
 
-    you must respond in ${currentLanguage} language. if failed for any reason detect user language in the text: "${originalUserInput}"  and respond according to it
+    You must respond in ${currentLanguage} language. If failed for any reason, detect user language in the text: "${originalUserInput}" and respond according to it.
 
-    Recommend the best place to visit that aligns with the user's mood and desires. Provide your recommendation in the following JSON format:
+    Recommend the 3 best places to visit that align with the user's mood and desires. IMPORTANT: Only recommend real, existing places in Dubai that can be found on Google Maps. Use the exact names from the provided list of places. Provide your recommendations in the following JSON format:
     {
-      "name": "Name of the recommended place",
-      "description": A 6-7 lines description of why this place is recommended, relating it to the user's mood and desires, it must be in ${currentLanguage} or detect ${originalUserInput} language and respond in the same language"
+      "recommendations": [
+        {
+          "name": "Exact name of the recommended place from the list",
+          "description": "A 4-5 lines description of why this place is recommended, relating it to the user's mood and desires"
+        },
+        {
+          "name": "Exact name of the second recommended place from the list",
+          "description": "A 4-5 lines description of why this place is recommended, relating it to the user's mood and desires"
+        },
+        {
+          "name": "Exact name of the third recommended place from the list",
+          "description": "A 4-5 lines description of why this place is recommended, relating it to the user's mood and desires"
+        }
+      ]
     }
 
     Return only the JSON object, without any additional text or explanation.
   `;
 
   try {
-    const result = await model.generateContent(prompt);
-    return JSON.parse(result.response.text());
+    const result = await model.generateContent({
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
+      generationConfig: {
+        temperature: 0.7,
+        topK: 40,
+        topP: 0.95,
+        maxOutputTokens: 2048,
+      },
+      safetySettings: [
+        { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+        { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+        { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+        { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+      ],
+    });
+
+    
+    const jsonResponse = JSON.parse(result.response.text());
+    return jsonResponse.recommendations;
   } catch (error) {
-    console.error('Error recommending best place:', error);
-    throw new Error('Failed to recommend best place');
+    console.error('Error recommending best places:', error);
+    throw new Error('Failed to recommend best places');
   }
 };
