@@ -16,4 +16,6 @@ export const PROMPT_TYPES = {
   TRANSLATE_PRIORITY: "translatePriority",
   AUDIO_COMMAND: "audioCommand",
   COUNTRY_DATA: "countryData",
+  AI_QUESTION: "aiQuestion",
+  VOICE_TO_TEXT: "voiceToText",
 };

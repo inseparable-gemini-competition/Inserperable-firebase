@@ -35,6 +35,8 @@ const KEYWORDS = [
   "shop",
   "impact",
   "tips",
+  "video",
+  "photos",
 ];
 export const getAudioCommandPrompt = () => {
   const prompt = `
@@ -189,7 +191,7 @@ Translation instructions:
         cuisine: ["string", "Translate: 'Cuisine'"],
         safety: ["string", "Translate: 'Safety'"],
         submit: ["string", "Translate: 'Submit'"],
-        findingPerfectPlace: ["string", "Translate: 'Finding Perfect Place'"],
+        findingPerfectPlaces: ["string", "Translate: 'Finding Perfect Places'"],
         viewOnMap: ["string", "Translate: 'View on Map'"],
         openInUber: ["string", "Translate: 'Open in Uber'"],
         weRecommend: ["string", "Translate: 'We Recommend'"],
@@ -212,12 +214,18 @@ Translation instructions:
         visiting: ["string", "Translate: 'Visiting'"],
         notVisiting: ["string", "Translate: 'Not Visiting'"],
         impactScore: ["string", "Translate: 'Impact Score'"],
-        whatIsYourOriginalCountry: ["string", "Translate: 'What is your original country?'"],
+        whatIsYourOriginalCountry: [
+          "string",
+          "Translate: 'What is your original country?'",
+        ],
         areYouCurrentlyTraveling: [
           "string",
           "Translate: 'Are you currently traveling?'",
         ],
-        whereAreYouTravelling: ["string", "Translate: 'Where are you travelling?'"],
+        whereAreYouTravelling: [
+          "string",
+          "Translate: 'Where are you travelling?'",
+        ],
         yes: ["string", "Translate: 'Yes'"],
         no: ["string", "Translate: 'No'"],
         enterYourAnswerHere: [
@@ -253,11 +261,73 @@ Translation instructions:
         uploadAndAnalyze: ["string", "Translate: 'Upload and Analyze'"],
         analyzeAnotherVideo: ["string", "Translate: 'Analyze Another Video'"],
         culturalInsights: ["string", "Translate: 'Cultural Insights'"],
+        WhatTransportationDidYouUseToday: [
+          "string",
+          "Translate: 'What transportation did you use today?'",
+        ],
+        KnowAllTheTaboosYouNeedToAvoid: [
+          "string",
+          "Translate: 'Know all the taboos you need to avoid'",
+        ],
+        pickAnyCategoryYouWantTipsAbout: [
+          "string",
+          "Translate: 'Pick any category you want tips about'",
+        ],
+        basedOnYourMoodAndDesiresWeWillRecommendBestDestination: [
+          "string",
+          "Translate: 'Based on your mood and desires we will recommend best destination'",
+        ],
+        weWillAnalyzeYourVideoCulturally: [
+          "string",
+          "Translate: 'We will analyze your video culturally'",
+        ],
+        weWillRecommendADonationEntityToYou: [
+          "string",
+          "Translate: 'We will recommend a donation entity to you'",
+        ],
+        findPlaces: ["string", "Translate: 'Find Places'"],
+        askQuestion: ["string", "Translate: 'Ask Question'"],
+        chatWithAI: ["string", "Translate: 'Chat With AI'"],
+        send: ["string", "Translate: 'Send'"],
+        fontSize: ["string", "Translate: 'Font Size'"],
+        experiment: ["string", "Translate: 'Experiment'"],
+        fontSizeRatio: ["string", "Translate: 'Font Size Ratio'"],
+        adjustRatio: ["string", "Translate: 'Adjust Ratio'"],
+        fontAndThemeSettings: [
+          "string",
+          "Translate: 'Font and Theme Settings'",
+        ],
+        fontFamilty: ["string", "Translate: 'Font Family'"],
+        uploadingVideo: ["string", "Translate: 'Uploading Video'"],
+        loadingYourBeautifulMemories: [
+          "string",
+          "Translate: 'Loading Your Beautiful Memories...'",
+        ],
+        generatingYourBeautifulCaptions: [
+          "string",
+          "Translate: 'Generating Your Beautiful Captions...'",
+        ],
+        processingYourUpload: [
+          "string",
+          "Translate: 'Processing Your Upload...'",
+        ],
+        hear: ["string", "Translate: 'Hear'"],
+        pause: ["string", "Translate: 'Pause'"],
+        askMore: ["string", "Translate: 'Ask more'"],
       },
     ],
   });
 
   return createPromptObject(prompt, schema);
+};
+
+export const getVoiceToTextPrompt = () => {
+  const prompt = `
+  Analyze the provided audio file and do the following:
+  you should first detect the language of the audio and then
+  convert the audio to text and return the text without any additional information.
+  `;
+  return createPromptObject(prompt);
 };
 
 // Return the prompt object with the schema
@@ -297,9 +367,12 @@ export const getTranslatePriorityWordsPrompt = (inputData) => {
           "string",
           "Translate: 'Are you currently traveling?'",
         ],
-        whereAreYouNow: ["string", "Translate: 'Where are you now?'"],
         yes: ["string", "Translate: 'Yes'"],
         no: ["string", "Translate: 'No'"],
+        whereAreYouTravelling: [
+          "string",
+          "Translate: 'Where are you travelling?'",
+        ],
         enterYourAnswerHere: [
           "string",
           "Translate: 'Enter your answer here...'",

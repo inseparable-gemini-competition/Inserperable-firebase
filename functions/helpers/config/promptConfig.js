@@ -73,4 +73,12 @@ export default {
     category: travelPrompts,
     functionName: "getCountryDataPrompt",
   },
+  [PROMPT_TYPES.AI_QUESTION]: {
+    category: travelPrompts,
+    functionName: "getQuestionPrompt",
+  },
+  [PROMPT_TYPES.VOICE_TO_TEXT]: {
+    category: languagePrompts,
+    functionName: "getVoiceToTextPrompt",
+  },
 };

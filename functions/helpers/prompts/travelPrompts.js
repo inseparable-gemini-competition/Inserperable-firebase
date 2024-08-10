@@ -5,7 +5,9 @@ import { generateSchema } from "../generateSchema.js";
 
 export const getTabooPrompt = (inputData) => {
   const prompt = `
-You are a culturally sensitive AI assistant helping travelers understand and respect local customs. Based on the traveler's destination (${inputData?.country || "unspecified country"}), your task is to:
+You are a culturally sensitive AI assistant helping travelers understand and respect local customs. Based on the traveler's destination (${
+    inputData?.country || "unspecified country"
+  }), your task is to:
 
 1. Generate a list of 10 diverse cultural taboos or sensitive topics for this country. if you didn't find any taboo, you can mention any cultural insight and state that it's not a taboo.
 2. Select one (only one) random taboo from this list, and don't render all the 10 taboos. just only one.
@@ -23,7 +25,9 @@ Important guidelines:
 - Be informal like you are a real tourist guide sharing local insights.
 
 
-Your response should be in the ${inputData?.currentLanguage || "English"} language.
+Your response should be in the ${
+    inputData?.currentLanguage || "English"
+  } language.
 if failed to do that detect the language of the user and provide the response in the same language.
 
 `;
@@ -32,7 +36,9 @@ if failed to do that detect the language of the user and provide the response in
 
 export const getTibsPrompt = (inputData) => {
   const prompt = `
-As an AI travel assistant, your task is to provide unique and valuable travel tips for ${inputData?.selectedType || "general travel"} in ${inputData?.country || "the specified country"}. Follow these steps:
+As an AI travel assistant, your task is to provide unique and valuable travel tips for ${
+    inputData?.selectedType || "general travel"
+  } in ${inputData?.country || "the specified country"}. Follow these steps:
 
 1. Generate a diverse list of 20 travel tips specific to the country and travel type.
 2. Select 3 truly random tips from this list. I repeat only 3
@@ -49,7 +55,9 @@ Guidelines:
 - Be informal like you are a real tourist guide sharing local insights.
 
 
-Your response should be in the ${inputData?.currentLanguage || "English"} language.
+Your response should be in the ${
+    inputData?.currentLanguage || "English"
+  } language.
 if failed to do that detect the language of the user and provide the response in the same language.
 `;
   return createPromptObject(prompt);
@@ -57,7 +65,9 @@ if failed to do that detect the language of the user and provide the response in
 
 export const getDonatePrompt = (inputData) => {
   const prompt = `
-As an AI assistant focused on ethical and impactful charitable giving, your task is to recommend donation entities or organizations in ${inputData?.country || "the specified country"}. For each recommendation, provide:
+As an AI assistant focused on ethical and impactful charitable giving, your task is to recommend donation entities or organizations in ${
+    inputData?.country || "the specified country"
+  }. For each recommendation, provide:
 
 1. Name of the organization
 2. Website URL
@@ -74,7 +84,9 @@ Guidelines:
 - Be informal like you are a real tourist guide sharing local insights.
 
 
-Your response should be in the ${inputData?.currentLanguage || "English"} language.
+Your response should be in the ${
+    inputData?.currentLanguage || "English"
+  } language.
 if failed to do that detect the language of the user and provide the response in the same language.
 `;
   const schema = generateSchema("recommendation donation entity name", {
@@ -87,7 +99,11 @@ if failed to do that detect the language of the user and provide the response in
 
 export const getSituationPrompt = (inputData) => {
   const prompt = `
-As an AI language assistant, your task is to provide appropriate language assistance for a traveler in ${inputData?.country || "the specified country"}. The traveler is in the following situation: ${inputData?.userSituation || "unspecified situation"}.
+As an AI language assistant, your task is to provide appropriate language assistance for a traveler in ${
+    inputData?.country || "the specified country"
+  }. The traveler is in the following situation: ${
+    inputData?.userSituation || "unspecified situation"
+  }.
 
 Please provide:
 1. A culturally appropriate phrase or sentence to use in this situation.
@@ -101,7 +117,11 @@ Guidelines:
 - Be informal like you are a real tourist guide sharing local insights.
 
 
-Your response should be in the ${inputData?.currentLanguage} language, with the suggested phrase in the local language of ${inputData?.country || "the specified country"}.
+Your response should be in the ${
+    inputData?.currentLanguage
+  } language, with the suggested phrase in the local language of ${
+    inputData?.country || "the specified country"
+  }.
 
 Response in any other language is not accepted at all, note that the language provided can also be a language code. For example, 'en' for English.
 if failed to do that detect the language of the user and provide the response in the same language.
@@ -144,11 +164,19 @@ if failed to do that detect the language of the user and provide the response in
     flag: ["string", "flag"],
     description: ["string", "recommended country description", false, "string"],
     baseLanguage: ["string", "base country language code"],
-    mostFamousLandmark: ["string", "most famous landmark for the recommended country"],
+    mostFamousLandmark: [
+      "string",
+      "most famous landmark for the recommended country",
+    ],
     couuntryCurrency: ["string", "recommended country currency"],
   });
 
   return createPromptObject(prompt, schema);
+};
+
+export const getQuestionPrompt = (inputData) => {
+  const prompt = `As an AI tourism assistant, your task is to answer users question about ${inputData?.subject}, you should deduce any missing info from the user.. your response should be in ${inputData?.currentLanguage} always keep track of the converstion, for more info history is there ${inputData?.chatHistory}`;
+  return createPromptObject(prompt);
 };
 
 export const getCountryDataPrompt = (inputData) => {
@@ -176,9 +204,17 @@ if failed to do that detect the language of the user and provide the response in
   const schema = generateSchema("details for country", {
     country: ["string", "user's input country"],
     flag: ["string", "flag"],
-    description: ["string", "user's input country description", false, "string"],
+    description: [
+      "string",
+      "user's input country description",
+      false,
+      "string",
+    ],
     baseLanguage: ["string", "base country language code"],
-    mostFamousLandmark: ["string", "most famous landmark for the user's input country"],
+    mostFamousLandmark: [
+      "string",
+      "most famous landmark for the user's input country",
+    ],
   });
 
   return createPromptObject(prompt, schema);
@@ -208,10 +244,12 @@ Guidelines:
 - Ensure recommendations are practical and relevant to the user's specific travel plans.
 - Present information in a way that encourages positive action without inducing excessive guilt or anxiety.
 - If certain information is missing, state assumptions made in your calculations.
-- Be informal like you are a real tourist guide sharing local insights.
+- Be insightful.
 
 
-Your response should be in the ${inputData?.currentLanguage || "English"} language.
+Your response should be in the ${
+    inputData?.currentLanguage || "English"
+  } language.
 `;
 
   const schema = generateSchema("calculate environmental impact", {

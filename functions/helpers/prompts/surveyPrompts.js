@@ -36,7 +36,7 @@ For multiple-choice questions, provide 3-5 options. For open-ended questions, se
 
 Try to tailor each new question based on previous responses to build a comprehensive traveler profile. Aim for a mix of specific and broad questions to gather diverse information for making an informed country recommendation.
 
-Your response should be in the ${inputData?.currentLanguage || "English"} language.
+Your response should be in the ${inputData?.currentLanguage || "English"} language. even if another language was used before
 
 If you encounter any issues or if the input data is insufficient, respond with a JSON object containing an "error" field explaining the issue.
 
