@@ -1,4 +1,3 @@
-// src/prompts/languagePrompts.js
 
 import { generateSchema } from "../generateSchema.js";
 import { createPromptObject } from "../utils/promptUtils.js";
@@ -209,8 +208,14 @@ Translation instructions:
           "Translate: ' Start speaking mic is red and press again to stop'",
         ],
         processing: ["string", "Translate: 'Processing'"],
-        identifiedCategory: ["string", "Translate: 'opening the category you want'"],
-        unidentifiedCategory: ["string", "Translate: 'the category you wanted not supported'"],
+        identifiedCategory: [
+          "string",
+          "Translate: 'opening the category you want'",
+        ],
+        unidentifiedCategory: [
+          "string",
+          "Translate: 'the category you wanted not supported'",
+        ],
         visiting: ["string", "Translate: 'Visiting'"],
         notVisiting: ["string", "Translate: 'Not Visiting'"],
         impactScore: ["string", "Translate: 'Impact Score'"],
@@ -314,6 +319,17 @@ Translation instructions:
         hear: ["string", "Translate: 'Hear'"],
         pause: ["string", "Translate: 'Pause'"],
         askMore: ["string", "Translate: 'Ask more'"],
+        photoDeleted: ["string", "Translate: 'Photo Deleted'"],
+        photoDeletionFailed: ["string", "Translate: 'Photo Deletion Failed'"],
+        searchFailed: ["string", "Translate: 'Search Failed'"],
+        uploadYourPhotosAndWeWillGenerateCaption: [
+          "string",
+          "Translate: 'Upload your photos and we will generate caption'",
+        ],
+        fetchingYourTravellingCountryData: [
+          "string",
+          "Translate: 'Fetching your travelling country data'",
+        ],
       },
     ],
   });

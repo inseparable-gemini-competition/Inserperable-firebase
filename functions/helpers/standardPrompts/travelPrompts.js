@@ -1,4 +1,3 @@
-// src/prompts/travelPrompts.js
 
 import { createPromptObject } from "../utils/promptUtils.js";
 import { generateSchema } from "../generateSchema.js";

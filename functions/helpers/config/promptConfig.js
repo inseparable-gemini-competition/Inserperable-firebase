@@ -1,8 +1,8 @@
 import { PROMPT_TYPES } from "../constants/promptTypes.js";
-import * as travelPrompts from "../prompts/travelPrompts.js";
-import * as languagePrompts from "../prompts/languagePrompts.js";
-import * as imagePrompts from "../prompts/imagePrompts.js";
-import * as surveyPrompts from "../prompts/surveyPrompts.js";
+import * as travelPrompts from "../standardPrompts/travelPrompts.js";
+import * as languagePrompts from "../standardPrompts/languagePrompts.js";
+import * as imagePrompts from "../standardPrompts/imagePrompts.js";
+import * as surveyPrompts from "../standardPrompts/surveyPrompts.js";
 
 export default {
   [PROMPT_TYPES.TABOO]: {

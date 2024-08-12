@@ -1,4 +1,3 @@
-// src/prompts/surveyPrompts.js
 
 import { createPromptObject } from "../utils/promptUtils.js";
 
