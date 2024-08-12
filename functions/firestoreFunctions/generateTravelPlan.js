@@ -39,6 +39,92 @@ const fetchPhotoUrl = async (description) => {
   }
 };
 
+const getLatLong = async (placeName) => {
+  if (!placeName) {
+    functions.logger.error(`No place name provided for geocoding`);
+    return { latitude: null, longitude: null };
+  }
+
+  try {
+    functions.logger.info(`Fetching Lat/Long for place: ${placeName}`);
+
+    const response = await axios.get(
+      `https://maps.googleapis.com/maps/api/geocode/json`,
+      {
+        params: {
+          address: placeName,
+          key: GOOGLE_API_KEY,
+        },
+      }
+    );
+
+    functions.logger.info(`Geocode API response for ${placeName}:`, response.data);
+
+    if (response.data.status !== "OK") {
+      functions.logger.error(
+        `Geocoding API error for ${placeName}: ${response.data.status}`,
+        { response: response.data }
+      );
+      return { latitude: null, longitude: null };
+    }
+
+    if (response.data.results.length === 0) {
+      functions.logger.warn(`No results found for ${placeName}`);
+      return { latitude: null, longitude: null };
+    }
+
+    const location = response.data.results[0].geometry.location;
+    if (
+      !location ||
+      typeof location.lat !== "number" ||
+      typeof location.lng !== "number"
+    ) {
+      functions.logger.error(`Invalid location data for ${placeName}`, {
+        location,
+      });
+      return { latitude: null, longitude: null };
+    }
+
+    functions.logger.info(`Lat/Long fetched for ${placeName}: ${location.lat}, ${location.lng}`);
+    return { latitude: location.lat, longitude: location.lng };
+  } catch (error) {
+    functions.logger.error(
+      `Error fetching lat/long for ${placeName}: ${error.message}`,
+      { error }
+    );
+    return { latitude: null, longitude: null };
+  }
+};
+
+const searchPlaces = async (searchPhrase) => {
+  try {
+    const response = await axios.get(
+      "https://maps.googleapis.com/maps/api/place/textsearch/json",
+      {
+        params: {
+          query: searchPhrase,
+          key: GOOGLE_API_KEY,
+        },
+      }
+    );
+
+    if (response.data.status !== "OK") {
+      functions.logger.error(`Places API error: ${response.data.status}`);
+      return [];
+    }
+
+    return response.data.results.map((place) => ({
+      name: place.name,
+      address: place.formatted_address,
+      rating: place.rating,
+      user_ratings_total: place.user_ratings_total,
+    }));
+  } catch (error) {
+    functions.logger.error("Error searching places:", error);
+    throw new Error("Failed to search places");
+  }
+};
+
 const cleanupJSON = (jsonString) => {
   const start = jsonString.indexOf("{");
   const end = jsonString.lastIndexOf("}");
@@ -76,167 +162,178 @@ export const generateTravelPlan = functions
     const previousValue = change.before.exists ? change.before.data() : null;
 
     if (!newValue) {
-      functions.logger.info("User document deleted, skipping travel plan generation");
+      functions.logger.info(
+        "User document deleted, skipping travel plan generation"
+      );
       return null;
     }
 
     // Check if this update is coming from this function itself
-    if (newValue.travelPlanLastUpdated && 
-        (!previousValue || newValue.travelPlanLastUpdated !== previousValue.travelPlanLastUpdated)) {
+    if (
+      newValue.travelPlanLastUpdated &&
+      (!previousValue ||
+        newValue.travelPlanLastUpdated !== previousValue.travelPlanLastUpdated)
+    ) {
       functions.logger.info("Travel plan just updated, skipping to avoid loop");
       return null;
     }
 
-    // Check if country has changed or if it's a new user
-    if (previousValue && newValue.country === previousValue.country && previousValue.travelPlan) {
-      functions.logger.info("Country not changed and travel plan exists, skipping generation");
-      return null;
-    }
-
     const country = newValue.country;
+    const baseLanguage = newValue.baseLanguage;
+
     functions.logger.info(
       `Generating travel plan for user: ${context.params.userId}, country: ${country}`
     );
-    const genAI = new GoogleGenerativeAI(GEN_AI_KEY);
 
+    const searchMoods = [
+      "Adventure",
+      "Romance",
+      "Cultural Exploration",
+      "Relaxation",
+      "Family Fun",
+      "Food & Dining",
+      "Shopping",
+    ];
+
+    const travelPlan = {};
+
+    for (const mood of searchMoods) {
+      const searchPhrase = `${mood} places to visit in ${country}`;
+      const places = await searchPlaces(searchPhrase);
+      if (places.length > 0) {
+        travelPlan[mood] = places.slice(0, 10).map((place) => ({
+          name: place.name,
+          exactName: place.name,
+          description: `Located at ${place.address}, rated ${place.rating} with ${place.user_ratings_total} reviews.`,
+        }));
+      } else {
+        functions.logger.warn(`No places found for mood: ${mood}`);
+      }
+    }
+
+    const genAI = new GoogleGenerativeAI(GEN_AI_KEY);
     const model = genAI.getGenerativeModel({
       model: "gemini-1.5-flash",
     });
 
-    const schema = {
-      type: "object",
-      properties: {
-        Adventure: {
-          type: "array",
-          items: {
-            type: "object",
-            properties: {
-              name: { type: "string" },
-              exactName: { type: "string" },
-              time: { type: "string" },
-              description: { type: "string" },
-            },
-            required: ["name", "exactName", "time", "description"],
-          },
-        },
-        Romance: {
-          type: "array",
-          items: {
-            type: "object",
-            properties: {
-              name: { type: "string" },
-              exactName: { type: "string" },
-              time: { type: "string" },
-              description: { type: "string" },
-            },
-            required: ["name", "exactName", "time", "description"],
-          },
-        },
-        "Cultural Exploration": {
-          type: "array",
-          items: {
-            type: "object",
-            properties: {
-              name: { type: "string" },
-              exactName: { type: "string" },
-              time: { type: "string" },
-              description: { type: "string" },
-            },
-            required: ["name", "exactName", "time", "description"],
-          },
-        },
-        Relaxation: {
-          type: "array",
-          items: {
-            type: "object",
-            properties: {
-              name: { type: "string" },
-              exactName: { type: "string" },
-              time: { type: "string" },
-              description: { type: "string" },
-            },
-            required: ["name", "exactName", "time", "description"],
-          },
-        },
-        "Family Fun": {
-          type: "array",
-          items: {
-            type: "object",
-            properties: {
-              name: { type: "string" },
-              exactName: { type: "string" },
-              time: { type: "string" },
-              description: { type: "string" },
-            },
-            required: ["name", "exactName", "time", "description"],
-          },
-        },
-        "Food & Dining": {
-          type: "array",
-          items: {
-            type: "object",
-            properties: {
-              name: { type: "string" },
-              exactName: { type: "string" },
-              time: { type: "string" },
-              description: { type: "string" },
-            },
-            required: ["name", "exactName", "time", "description"],
-          },
-        },
-        Shopping: {
-          type: "array",
-          items: {
-            type: "object",
-            properties: {
-              name: { type: "string" },
-              exactName: { type: "string" },
-              time: { type: "string" },
-              description: { type: "string" },
-            },
-            required: ["name", "exactName", "time", "description"],
-          },
-        },
-      },
-      required: [
-        "Adventure",
-        "Romance",
-        "Cultural Exploration",
-        "Relaxation",
-        "Family Fun",
-        "Food & Dining",
-        "Shopping",
-      ],
-    };
+    const generateAndRefineTravelPlan = async () => {
+      const prompt = `
+        Based on the following real places identified for different moods:
+        ${JSON.stringify(travelPlan, null, 2)}
 
-    const generateAndParseTravelPlan = async () => {
-      const query = `
-        Generate a 7-mood travel plan for visiting ${country}. The moods should be: Adventure, Romance, Cultural Exploration, Relaxation, Family Fun, Food & Dining, and Shopping. Each mood should have multiple entries (up to 10-15), and each entry should have a name, best time to visit, and a brief description of the place to visit. Please structure the response as a JSON object with mood names as keys and each key should contain an array of objects with the properties: name, time (best time in day), and description. The JSON object should look like this:
-        {
-          "Adventure": [
-            {"name": "Example Place", "exactName": "place exact name", "time": "Best time to visit in the day", "description": "Brief description of the place"},
-            ...
-          ],
-          "Romance": [
-            {"name": "Example Place", "exactName": "place exact name", "time": "Best time to visit in the day", "description": "Brief description of the place"},
-            ...
-          ],
-          ...
-        }
+        Refine and generate a comprehensive travel plan for visiting ${country}. The travel plan should include recommendations for each of the following moods: Adventure, Romance, Cultural Exploration, Relaxation, Family Fun, Food & Dining, and Shopping. Each recommendation should include the place name, the best time to visit, and a brief description. The response should be structured as a JSON object with mood names as keys and each key containing an array of objects with the properties: name, time, and description.
 
-        Guideline:
-        - all the text has to be in ${newValue?.baseLanguage} language
-        - all the places have to be real place that will have latitude and longitude
-        - Don't say general activities like "go to the beach", instead say "go to the beach in X city"
-        - Each mood should contain 10 places.
-
+        Please ensure the travel plan is in ${baseLanguage}.
       `;
 
-      functions.logger.info(`Sending query to Generative AI: ${query}`);
       const result = await model.generateContent({
-        contents: [{ role: "user", parts: [{ text: query }] }],
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
         generationConfig: {
-          responseSchema: schema,
+          responseSchema: {
+            type: "object",
+            properties: {
+              Adventure: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    name: { type: "string" },
+                    exactName: { type: "string" },
+                    time: { type: "string" },
+                    description: { type: "string" },
+                  },
+                  required: ["name", "exactName", "time", "description"],
+                },
+              },
+              Romance: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    name: { type: "string" },
+                    exactName: { type: "string" },
+                    time: { type: "string" },
+                    description: { type: "string" },
+                  },
+                  required: ["name", "exactName", "time", "description"],
+                },
+              },
+              "Cultural Exploration": {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    name: { type: "string" },
+                    exactName: { type: "string" },
+                    time: { type: "string" },
+                    description: { type: "string" },
+                  },
+                  required: ["name", "exactName", "time", "description"],
+                },
+              },
+              Relaxation: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    name: { type: "string" },
+                    exactName: { type: "string" },
+                    time: { type: "string" },
+                    description: { type: "string" },
+                  },
+                  required: ["name", "exactName", "time", "description"],
+                },
+              },
+              "Family Fun": {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    name: { type: "string" },
+                    exactName: { type: "string" },
+                    time: { type: "string" },
+                    description: { type: "string" },
+                  },
+                  required: ["name", "exactName", "time", "description"],
+                },
+              },
+              "Food & Dining": {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    name: { type: "string" },
+                    exactName: { type: "string" },
+                    time: { type: "string" },
+                    description: { type: "string" },
+                  },
+                  required: ["name", "exactName", "time", "description"],
+                },
+              },
+              Shopping: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    name: { type: "string" },
+                    exactName: { type: "string" },
+                    time: { type: "string" },
+                    description: { type: "string" },
+                  },
+                  required: ["name", "exactName", "time", "description"],
+                },
+              },
+            },
+            required: [
+              "Adventure",
+              "Romance",
+              "Cultural Exploration",
+              "Relaxation",
+              "Family Fun",
+              "Food & Dining",
+              "Shopping",
+            ],
+          },
         },
       });
 
@@ -248,16 +345,23 @@ export const generateTravelPlan = functions
     };
 
     try {
-      const travelPlan = await retryOperation(generateAndParseTravelPlan);
-      functions.logger.info("Generated travel plan", { travelPlan });
+      const refinedTravelPlan = await retryOperation(
+        generateAndRefineTravelPlan
+      );
+      functions.logger.info("Generated travel plan", { refinedTravelPlan });
 
       const latLongAndPhotoPromises = [];
-      for (const mood in travelPlan) {
-        for (const place of travelPlan[mood]) {
+      for (const mood in refinedTravelPlan) {
+        for (const place of refinedTravelPlan[mood]) {
+          const exactName = place.exactName || place.name; // Fallback to place.name if exactName is undefined
           latLongAndPhotoPromises.push(
-            getLatLong(place.exactName).then((latLong) => {
-              place.latitude = latLong.latitude;
-              place.longitude = latLong.longitude;
+            getLatLong(exactName).then((latLong) => {
+              if (latLong.latitude && latLong.longitude) {
+                place.latitude = latLong.latitude;
+                place.longitude = latLong.longitude;
+              } else {
+                functions.logger.warn(`No valid lat/long found for place: ${exactName}`);
+              }
               return fetchPhotoUrl(place.name).then((photoUrl) => {
                 place.photoUrl = photoUrl;
               });
@@ -269,8 +373,8 @@ export const generateTravelPlan = functions
       await Promise.all(latLongAndPhotoPromises);
 
       await db.collection("users").doc(context.params.userId).update({
-        travelPlan,
-        travelPlanLastUpdated: FieldValue.serverTimestamp()
+        travelPlan: refinedTravelPlan,
+        travelPlanLastUpdated: FieldValue.serverTimestamp(),
       });
 
       functions.logger.info("Travel plan saved successfully!", {
@@ -283,60 +387,7 @@ export const generateTravelPlan = functions
       );
       await db.collection("users").doc(context.params.userId).update({
         travelPlanError: error.message,
-        travelPlanLastUpdated: FieldValue.serverTimestamp()
+        travelPlanLastUpdated: FieldValue.serverTimestamp(),
       });
     }
   });
-
-const getLatLong = async (placeName) => {
-  try {
-    const response = await axios.get(
-      `https://maps.googleapis.com/maps/api/geocode/json`,
-      {
-        params: {
-          address: placeName,
-          key: GOOGLE_API_KEY,
-        },
-      }
-    );
-
-    if (response.data.status !== "OK") {
-      functions.logger.error(
-        `Geocoding API error for ${placeName}: ${response.data.status}`,
-        { response: response.data }
-      );
-      return { latitude: null, longitude: null };
-    }
-
-    if (response.data.results.length === 0) {
-      functions.logger.warn(`No results found for ${placeName}`);
-      return { latitude: null, longitude: null };
-    }
-
-    const location = response.data.results[0].geometry.location;
-    if (
-      !location ||
-      typeof location.lat !== "number" ||
-      typeof location.lng !== "number"
-    ) {
-      functions.logger.error(`Invalid location data for ${placeName}`, {
-        location,
-      });
-      return { latitude: null, longitude: null };
-    }
-
-    functions.logger.info(`Lat/Long fetched for ${placeName}`, { location });
-    return { latitude: location.lat, longitude: location.lng };
-  } catch (error) {
-    functions.logger.error(
-      `Error fetching lat/long for ${placeName}: ${error.message}`,
-      { error }
-    );
-    if (error.response) {
-      functions.logger.error("Error response from Geocoding API", {
-        response: error.response.data,
-      });
-    }
-    return { latitude: null, longitude: null };
-  }
-};

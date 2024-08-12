@@ -10,7 +10,7 @@ export const getHandmadeItems = functions.https.onCall(async (data) => {
 
   try {
     let itemsQuery = db.collection("products")
-      .orderBy("createdAt")
+      .orderBy('createdAt', 'desc')
       .limit(10);
 
     if (pageParam) {

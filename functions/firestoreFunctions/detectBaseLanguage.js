@@ -24,7 +24,7 @@ export const detectBaseLanguage = functions.firestore
         Identify the primary official language of ${user.baseCountry}.
         
         Requirements:
-        1. Provide only the name of the language.
+        1. Provide only the name of the language. dont' give codes or abbreviations or subcodes. the one word name of the language is required..eg..English, Spanish, French, Arabic etc.
         2. If multiple official languages exist, list only the most widely spoken one.
         3. Use the English name for the language.
         4. Do not include any introductory text, explanations, or punctuation.
@@ -32,7 +32,7 @@ export const detectBaseLanguage = functions.firestore
         Example responses:
         English
         Spanish
-        Mandarin Chinese
+        Chinese
         `;
 
         const result = await model.generateContent([languageQuery]);

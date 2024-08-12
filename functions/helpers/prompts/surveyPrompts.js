@@ -16,6 +16,7 @@ Guidelines:
 7. Provide only the JSON response, nothing more or less.
 8. use wide variation of questions.
 9. Ensure no questions are repeated.
+10. options should be short and clear.
 
 
 JSON Structure:
@@ -65,6 +66,8 @@ export const getNextQuestionEnvironmentPrompt = (inputData) => {
   5. Ensure no questions are repeated.
   6. Your response should be in the ${inputData?.currentLanguage || "English"} language.
   7. Always include "Nothing" as an option in the multiple-choice questions.
+  8. options should be short and clear.
+
 
   JSON Structure:
   {

@@ -181,7 +181,7 @@ Translation instructions:
         calculatingImpact: ["string", "Translate: 'Calculating Impact'"],
 
         // Results and Recommendations
-        yourEnvironmentalImactScore: [
+        yourEnvironmentalImpactScore: [
           "string",
           "Translate: 'Your Environmental Impact Score'",
         ],
@@ -206,11 +206,11 @@ Translation instructions:
         nothing: ["string", "Translate: 'Nothing'"],
         pleaseStartSpeakingAndLongPresToStop: [
           "string",
-          "Translate: 'Please start speaking when the mic is red and make long press to stop'",
+          "Translate: ' Start speaking mic is red and press again to stop'",
         ],
         processing: ["string", "Translate: 'Processing'"],
-        identifiedCategory: ["string", "Translate: 'Identified Category'"],
-        unidentifiedCategory: ["string", "Translate: 'Unidentified Category'"],
+        identifiedCategory: ["string", "Translate: 'opening the category you want'"],
+        unidentifiedCategory: ["string", "Translate: 'the category you wanted not supported'"],
         visiting: ["string", "Translate: 'Visiting'"],
         notVisiting: ["string", "Translate: 'Not Visiting'"],
         impactScore: ["string", "Translate: 'Impact Score'"],

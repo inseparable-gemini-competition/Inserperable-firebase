@@ -146,7 +146,7 @@ As an AI travel recommendation system, your task is to suggest a suitable countr
    b) Flag (as a text emoji)
    c) Concise overview (50-75 words)
    d) Name of the most iconic landmark
-   e) The user's base language (based on their base country)
+   e) The user's base language (based on their base country) - Provide only the name of the language. don't give codes or abbreviations or subcodes. the one word name of the language is required..eg..English, Spanish, French, Arabic etc.
    f) The country's currency
 
 Guidelines:
@@ -175,7 +175,9 @@ if failed to do that detect the language of the user and provide the response in
 };
 
 export const getQuestionPrompt = (inputData) => {
-  const prompt = `As an AI tourism assistant, your task is to answer users question about ${inputData?.subject}, you should deduce any missing info from the user.. your response should be in ${inputData?.currentLanguage} always keep track of the converstion, for more info history is there ${inputData?.chatHistory}`;
+  const prompt = `As an AI tourism assistant, your task is to answer users question about subject: ${inputData?.subject}, you should always assume that the user your response should be talking about the subject provided as ${inputData?.subject}
+  so don't ask him about the subject again
+  answer in ${inputData?.currentLanguage} always keep track of the converstion, for more info history is there ${inputData?.chatHistory}`;
   return createPromptObject(prompt);
 };
 
@@ -191,7 +193,7 @@ As an AI travel recommendation system, your task is to get data for user's curre
    b) Flag (as a text emoji)
    c) Concise overview (50-75 words)
    d) Name of the most iconic landmark
-   e) The user's base language (based on their base country)
+   e) The user's base language (based on their base country). Provide only the name of the language. don't give codes or abbreviations or subcodes. the one word name of the language is required..eg..English, Spanish, French, Arabic etc.
 
 Guidelines:
 - Provide a balanced overview, highlighting both positives and potential challenges.
