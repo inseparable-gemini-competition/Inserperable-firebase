@@ -203,7 +203,7 @@ Translation instructions:
         bicycle: ["string", "Translate: 'Bicycle'"],
         walking: ["string", "Translate: 'Walking'"],
         nothing: ["string", "Translate: 'Nothing'"],
-        pleaseStartSpeakingAndLongPresToStop: [
+        pleaseStartSpeakingAndPressAgainToStop: [
           "string",
           "Translate: ' Start speaking mic is red and press again to stop'",
         ],
